@@ -7,7 +7,6 @@ Créé par EpSy – Communauté DayZ Francophone
 import streamlit as st
 import json
 import xml.etree.ElementTree as ET
-from xml.dom import minidom
 import re
 
 # ==============================
@@ -39,6 +38,10 @@ st.markdown("""
     border-radius: 14px;
 }
 
+.codebox textarea {
+    max-height: 380px;
+}
+
 .footer {
     text-align: center;
     margin-top: 40px;
@@ -50,18 +53,16 @@ st.markdown("""
 # ==============================
 # SESSION STATE
 # ==============================
-if "content" not in st.session_state:
-    st.session_state.content = ""
-if "filename" not in st.session_state:
-    st.session_state.filename = ""
-if "filetype" not in st.session_state:
-    st.session_state.filetype = None
-if "error_info" not in st.session_state:
-    st.session_state.error_info = None
-if "highlighted" not in st.session_state:
-    st.session_state.highlighted = ""
-if "corrected" not in st.session_state:
-    st.session_state.corrected = ""
+for key, default in {
+    "content": "",
+    "filename": "",
+    "filetype": None,
+    "error_info": None,
+    "highlighted": "",
+    "corrected": ""
+}.items():
+    if key not in st.session_state:
+        st.session_state[key] = default
 
 # ==============================
 # UTILS
@@ -73,25 +74,56 @@ def highlight_error(content, line):
     return "\n".join(lines)
 
 def extract_error_info(err):
-    """Normalise XML / JSON errors"""
     if isinstance(err, json.JSONDecodeError):
         return {
+            "type": "json",
             "line": err.lineno,
             "column": err.colno,
-            "message": err.msg
+            "raw": err.msg
         }
     elif isinstance(err, ET.ParseError):
         return {
+            "type": "xml",
             "line": err.position[0],
             "column": err.position[1],
-            "message": str(err)
+            "raw": str(err)
         }
-    else:
-        return {
-            "line": "?",
-            "column": "?",
-            "message": str(err)
-        }
+    return None
+
+def explain_error(err):
+    raw = err["raw"].lower()
+
+    if err["type"] == "json":
+        if "expecting ',' delimiter" in raw:
+            return (
+                "Erreur de syntaxe JSON",
+                "Une virgule est manquante ou mal placée.",
+                "Ajoute ou corrige la virgule entre deux éléments."
+            )
+        if "unterminated string" in raw:
+            return (
+                "Chaîne de caractères non fermée",
+                "Un guillemet est manquant.",
+                "Ajoute le guillemet fermant (\")."
+            )
+        return (
+            "Structure JSON invalide",
+            "Le fichier ne respecte pas la syntaxe JSON.",
+            "Vérifie accolades, crochets et virgules."
+        )
+
+    if err["type"] == "xml":
+        if "mismatched tag" in raw:
+            return (
+                "Balise XML incorrecte",
+                "Une balise fermante ne correspond pas à l’ouvrante.",
+                "Vérifie l’ouverture et la fermeture des balises."
+            )
+        return (
+            "Structure XML invalide",
+            "Le XML n’est pas bien formé.",
+            "Vérifie l’imbrication et les caractères spéciaux."
+        )
 
 def validate_json(content):
     try:
@@ -132,7 +164,7 @@ uploaded = st.file_uploader("📤 Dépose ton fichier XML ou JSON", type=["xml",
 if uploaded:
     st.session_state.content = uploaded.read().decode("utf-8")
     st.session_state.filename = uploaded.name
-    st.session_state.filetype = uploaded.name.split(".")[-1]
+    st.session_state.filetype = uploaded.name.split(".")[-1].lower()
 
 # ==============================
 # VALIDATION
@@ -141,7 +173,7 @@ if st.session_state.filename:
     col1, col2 = st.columns(2)
 
     with col1:
-        if st.button("Valider XML") and st.session_state.filetype == "xml":
+        if st.button("🟩 Valider XML") and st.session_state.filetype == "xml":
             err = validate_xml(st.session_state.content)
             if err:
                 st.session_state.error_info = err
@@ -150,7 +182,7 @@ if st.session_state.filename:
                 )
 
     with col2:
-        if st.button("Valider JSON") and st.session_state.filetype == "json":
+        if st.button("🟦 Valider JSON") and st.session_state.filetype == "json":
             err = validate_json(st.session_state.content)
             if err:
                 st.session_state.error_info = err
@@ -163,30 +195,28 @@ if st.session_state.filename:
 # ==============================
 if st.session_state.error_info:
     e = st.session_state.error_info
+    title, desc, solution = explain_error(e)
 
     st.markdown(f"""
 <div class="error">
-<h4>❌ Erreur détectée</h4>
+<h4>❌ {title}</h4>
 <b>📍 Localisation :</b> Ligne {e["line"]}, Colonne {e["column"]}<br>
-<b>🧠 Description :</b> {e["message"]}
+<b>🧠 Description :</b> {desc}
 </div>
 """, unsafe_allow_html=True)
 
-    st.markdown("""
+    st.markdown(f"""
 <div class="solution">
 <h4>💡 Solution</h4>
-<ul>
-<li>Vérifie la ligne indiquée</li>
-<li>Supprime les virgules finales</li>
-<li>Vérifie les caractères spéciaux (&, <, >)</li>
-</ul>
+{solution}
 </div>
 """, unsafe_allow_html=True)
 
     st.text_area(
-        "🔍 Code concerné",
+        "🔍 Code analysé",
         value=st.session_state.highlighted,
-        height=380
+        height=380,
+        key="codebox"
     )
 
 # ==============================
@@ -194,23 +224,22 @@ if st.session_state.error_info:
 # ==============================
 if st.session_state.error_info:
     if st.button("🔧 Corriger automatiquement"):
-        st.session_state.corrected = auto_correct(st.session_state.content)
-        st.session_state.content = st.session_state.corrected
+        st.session_state.content = auto_correct(st.session_state.content)
         st.session_state.error_info = None
-        st.session_state.highlighted = ""
+        st.session_state.highlighted = st.session_state.content
         st.success("✅ Correction appliquée")
 
 # ==============================
 # DOWNLOAD
 # ==============================
-if st.session_state.corrected:
+if st.session_state.content:
     st.download_button(
         "⬇️ Télécharger le fichier corrigé",
-        data=st.session_state.corrected,
+        data=st.session_state.content,
         file_name=st.session_state.filename,
         mime="text/plain"
     )
-    st.info("ℹ️ Pense à renommer le fichier comme l’original si nécessaire")
+    st.info("ℹ️ Pense à renommer le fichier avec son nom d’origine si nécessaire")
 
 # ==============================
 # RESET
