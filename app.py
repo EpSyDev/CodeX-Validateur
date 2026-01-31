@@ -413,7 +413,7 @@ def auto_correct(content):
 def main():
     # Header avec logo
     try:
-        st.image("images/Codex3.png", use_column_width=True)
+        st.image("images/codex3-V2.png", use_column_width=True)
     except:
         st.warning("Logo CodeX introuvable")
         pass
