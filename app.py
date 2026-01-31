@@ -2,7 +2,7 @@
 Codex Validateur XML/JSON
 L'outil indispensable pour vérifier vos fichiers de configuration DayZ
 Créé par EpSy pour la communauté francophone DayZ
-VERSION CORRIGÉE - Fixes: transparence images, boutons cliquables, auto-correction optimisée
+VERSION FINALE - Boutons images cliquables + Export fichier corrigé
 """
 
 import streamlit as st
@@ -81,7 +81,7 @@ st.markdown("""
         margin-top: 10px;
     }
     
-    /* FIX 1: Boutons personnalisés avec transparence des images */
+    /* CORRECTION FINALE: Boutons images cliquables */
     .stButton > button {
         width: 100%;
         border: none;
@@ -90,14 +90,19 @@ st.markdown("""
         height: auto;
         background: transparent;
         transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
     }
     
     .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
     }
     
-    /* FIX 1: Assurer la transparence des images PNG */
+    .stButton > button:active {
+        transform: translateY(-2px);
+    }
+    
+    /* Transparence absolue des images */
     .stButton > button img,
     .stImage img,
     img {
@@ -106,6 +111,12 @@ st.markdown("""
         border-radius: 12px;
         background-color: transparent !important;
         background: transparent !important;
+        display: block;
+    }
+    
+    /* Cacher le texte du bouton (on garde juste l'image) */
+    .stButton > button div[data-testid="stMarkdownContainer"] {
+        display: none;
     }
     
     /* Zone de texte */
@@ -372,7 +383,7 @@ def analyze_json_error(content, error):
     return suggestions
 
 def auto_correct(content):
-    """FIX 3: Tentative de correction automatique optimisée"""
+    """Tentative de correction automatique avec retour détaillé"""
     is_json = content.strip().startswith(('{', '['))
     corrected = content
     corrections_applied = []
@@ -401,62 +412,56 @@ def auto_correct(content):
 # Interface principale
 def main():
     # Header avec logo
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        try:
-            st.image("images/Codex3.png", width=True)
-        except:
-            pass
+    try:
+    st.image("images/Codex3.png", use_column_width=True)
+except:
+    pass
     
     st.markdown('<h1 class="main-title">Codex Validateur XML/JSON</h1>', unsafe_allow_html=True)
     st.markdown('<p class="subtitle">L\'outil indispensable pour vérifier vos fichiers de configuration DayZ</p>', unsafe_allow_html=True)
     st.markdown('<div class="dayz-tag">🎮 Communauté DayZ Francophone</div>', unsafe_allow_html=True)
     st.markdown('<div class="separator"></div>', unsafe_allow_html=True)
     
-    # FIX 2: Boutons d'action avec images cliquables
+    # CORRECTION FINALE: Boutons d'action avec images cliquables UNIQUEMENT (sans bouton "Charger fichier")
     st.markdown("### 🎯 Actions disponibles")
-    col1, col2, col3, col4, col5 = st.columns(5)
+    col1, col2, col3, col4 = st.columns(4)  # 4 colonnes au lieu de 5
     
     with col1:
-        # Afficher l'image et le bouton ensemble
-        if st.button("📁 Charger fichier", key="load", help="Charger fichier", use_container_width=True):
-            st.session_state.action = "load"
         try:
-            st.image("images/charger_fichier.png", width=150)
+            # L'image devient le bouton grâce au CSS
+            if st.button("xml_btn", key="xml", help="Valider XML"):
+                st.session_state.action = "xml"
+            st.image("images/xml.png", use_container_width=True)
         except:
-            pass
+            if st.button("</> XML", key="xml_fallback"):
+                st.session_state.action = "xml"
     
     with col2:
-        if st.button("</> XML", key="xml", help="Valider XML", use_container_width=True):
-            st.session_state.action = "xml"
         try:
-            st.image("images/xml.png", width=150)
+            if st.button("json_btn", key="json", help="Valider JSON"):
+                st.session_state.action = "json"
+            st.image("images/json.png", use_container_width=True)
         except:
-            pass
+            if st.button("{} JSON", key="json_fallback"):
+                st.session_state.action = "json"
     
     with col3:
-        if st.button("{} JSON", key="json", help="Valider JSON", use_container_width=True):
-            st.session_state.action = "json"
         try:
-            st.image("images/json.png", width=150)
+            if st.button("correct_btn", key="correct", help="Auto-corriger"):
+                st.session_state.action = "correct"
+            st.image("images/auto_corriger.png", use_container_width=True)
         except:
-            pass
+            if st.button("🔧 Auto-corriger", key="correct_fallback"):
+                st.session_state.action = "correct"
     
     with col4:
-        if st.button("🔧 Auto-corriger", key="correct", help="Auto-corriger", use_container_width=True):
-            st.session_state.action = "correct"
         try:
-            st.image("images/auto_corriger.png", width=150)
+            if st.button("clear_btn", key="clear", help="Effacer"):
+                st.session_state.action = "clear"
+            st.image("images/effacer.png", use_container_width=True)
         except:
-            pass
-    
-    with col5:
-        if st.button("🗑️ Effacer", key="clear", help="Effacer", use_container_width=True):
-            st.session_state.action = "clear"
-        try:
-            st.image("images/effacer.png", width=150)
-        except:
-            pass
+            if st.button("🗑️ Effacer", key="clear_fallback"):
+                st.session_state.action = "clear"
     
     st.markdown('<div class="separator"></div>', unsafe_allow_html=True)
     
@@ -464,10 +469,12 @@ def main():
     if 'content' not in st.session_state:
         st.session_state.content = ""
     
+    # CORRECTION: On garde juste le file_uploader (le bouton "Charger" est supprimé)
     uploaded_file = st.file_uploader("📤 Ou glisse ton fichier ici", type=['xml', 'json', 'txt'])
     
     if uploaded_file is not None:
         st.session_state.content = uploaded_file.read().decode('utf-8')
+        st.session_state.uploaded_filename = uploaded_file.name
     
     content = st.text_area(
         "📝 Colle ou édite ton code ici:",
@@ -484,10 +491,12 @@ def main():
         
         if action == "clear":
             st.session_state.content = ""
+            if 'uploaded_filename' in st.session_state:
+                del st.session_state.uploaded_filename
             st.rerun()
         
         elif action == "correct":
-            # FIX 3: Amélioration de l'auto-correction avec feedback
+            # AMÉLIORATION FINALE: Export du fichier corrigé
             if content.strip():
                 with st.spinner('🔧 Correction en cours...'):
                     corrected, corrections = auto_correct(content)
@@ -495,8 +504,29 @@ def main():
                     if corrected != content:
                         st.session_state.content = corrected
                         st.success(f"✅ Corrections appliquées : {', '.join(corrections)}")
-                        st.info("💡 Vérifie le code ci-dessus et lance une validation pour confirmer.")
-                        st.rerun()
+                        
+                        # NOUVEAU: Proposer le téléchargement du fichier corrigé
+                        st.markdown("#### 📥 Télécharge ton fichier corrigé")
+                        
+                        # Déterminer le nom et l'extension du fichier
+                        if 'uploaded_filename' in st.session_state:
+                            filename = st.session_state.uploaded_filename
+                        else:
+                            # Détecter le type de fichier
+                            is_json = corrected.strip().startswith(('{', '['))
+                            ext = 'json' if is_json else 'xml'
+                            filename = f"fichier_corrige.{ext}"
+                        
+                        # Bouton de téléchargement
+                        st.download_button(
+                            label="💾 Télécharger le fichier corrigé",
+                            data=corrected,
+                            file_name=filename.replace('.', '_corrige.'),
+                            mime='text/plain',
+                            key='download_corrected'
+                        )
+                        
+                        st.info("💡 Le code corrigé est aussi affiché ci-dessus. Lance une validation pour vérifier !")
                     else:
                         st.info("ℹ️ Aucune correction automatique nécessaire. Le code semble déjà propre !")
             else:
@@ -520,6 +550,15 @@ def main():
                     
                     st.markdown("#### 🎨 Code formaté:")
                     st.code(results['formatted'], language='xml')
+                    
+                    # Bouton de téléchargement du XML formaté
+                    st.download_button(
+                        label="💾 Télécharger le XML formaté",
+                        data=results['formatted'],
+                        file_name='fichier_formate.xml',
+                        mime='text/xml',
+                        key='download_xml'
+                    )
                 else:
                     st.markdown(f"""
                         <div class="error-box">
@@ -557,6 +596,15 @@ def main():
                     
                     st.markdown("#### 🎨 Code formaté:")
                     st.code(results['formatted'], language='json')
+                    
+                    # Bouton de téléchargement du JSON formaté
+                    st.download_button(
+                        label="💾 Télécharger le JSON formaté",
+                        data=results['formatted'],
+                        file_name='fichier_formate.json',
+                        mime='application/json',
+                        key='download_json'
+                    )
                 else:
                     st.markdown(f"""
                         <div class="error-box">
