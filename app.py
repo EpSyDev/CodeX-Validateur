@@ -404,7 +404,7 @@ def main():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         try:
-            st.image("images/Codex3.png", width=200)
+            st.image("images/Codex3.png", width=True)
         except:
             pass
     
