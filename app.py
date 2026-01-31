@@ -413,9 +413,10 @@ def auto_correct(content):
 def main():
     # Header avec logo
     try:
-    st.image("images/Codex3.png", use_column_width=True)
-except:
-    pass
+        st.image("images/Codex3.png", use_column_width=True)
+    except:
+        st.warning("Logo CodeX introuvable")
+        pass
     
     st.markdown('<h1 class="main-title">Codex Validateur XML/JSON</h1>', unsafe_allow_html=True)
     st.markdown('<p class="subtitle">L\'outil indispensable pour vérifier vos fichiers de configuration DayZ</p>', unsafe_allow_html=True)
