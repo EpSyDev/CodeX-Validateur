@@ -11,6 +11,14 @@ from pathlib import Path
 # Ajouter le dossier modules au path Python
 sys.path.insert(0, str(Path(__file__).parent / "modules"))
 
+# DEBUG
+import os
+st.write("DEBUG - Contenu racine :", os.listdir("."))
+st.write("DEBUG - modules/ existe ?", os.path.exists("modules"))
+if os.path.exists("modules"):
+    st.write("DEBUG - Contenu modules/ :", os.listdir("modules"))
+st.write("DEBUG - sys.path :", sys.path[:3])
+
 from modules.validator import validate
 from modules.locator import locate_real_error
 from modules.comparator import compare_before_after, compare_side_by_side
