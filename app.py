@@ -11,10 +11,10 @@ from pathlib import Path
 # Ajouter le dossier modules au path Python
 sys.path.insert(0, str(Path(__file__).parent / "modules"))
 
-from validator import validate
-from locator import locate_real_error
-from comparator import compare_before_after, compare_side_by_side
-from corrector import auto_correct, can_auto_correct, suggest_manual_fixes
+from modules.validator import validate
+from modules.locator import locate_real_error
+from modules.comparator import compare_before_after, compare_side_by_side
+from modules.corrector import auto_correct, can_auto_correct, suggest_manual_fixes
 
 
 # ==============================
