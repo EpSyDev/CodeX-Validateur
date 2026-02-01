@@ -1,1 +1,127 @@
+{
+  "version": "1.0",
+  "description": "Base de données des erreurs fréquentes dans les fichiers DayZ – utilisée par errors_matcher.py",
+  "errors": [
 
+    {
+      "id": "JSON_001",
+      "type": "JSON",
+      "titre": "Virgule finale avant } ou ]",
+      "pattern": "virgule_finale",
+      "exemple_avant": "{\n  \"damage\": 45,\n  \"rateOfFire\": 12,\n}",
+      "exemple_après": "{\n  \"damage\": 45,\n  \"rateOfFire\": 12\n}",
+      "message_novice": "Tu as une virgule après le dernier élément avant une accolade ou un crochet fermant. En JSON, le dernier élément d'une liste ou d'un groupe ne doit pas avoir de virgule après lui.",
+      "message_modder": "Virgule traînante détectée. Supprime la virgule sur la dernière entrée avant } ou ].",
+      "correction_automatique": true
+    },
+
+    {
+      "id": "JSON_002",
+      "type": "JSON",
+      "titre": "Guillemets simples au lieu de doubles",
+      "pattern": "guillemets_simples",
+      "exemple_avant": "{\n  'damage': 45,\n  'rateOfFire': 12\n}",
+      "exemple_après": "{\n  \"damage\": 45,\n  \"rateOfFire\": 12\n}",
+      "message_novice": "En JSON, les clés et les textes doivent être entre guillemets doubles (\"). Les guillemets simples (') ne sont pas acceptés.",
+      "message_modder": "Guillemets simples détectés. JSON impose des doubles guillemets uniquement.",
+      "correction_automatique": true
+    },
+
+    {
+      "id": "JSON_003",
+      "type": "JSON",
+      "titre": "Clé sans guillemets",
+      "pattern": "cle_sans_guillemets",
+      "exemple_avant": "{\n  damage: 45,\n  rateOfFire: 12\n}",
+      "exemple_après": "{\n  \"damage\": 45,\n  \"rateOfFire\": 12\n}",
+      "message_novice": "Chaque clé dans un fichier JSON doit être entre guillemets doubles. Par exemple : \"damage\" et pas juste damage.",
+      "message_modder": "Clé non quotée détectée. Entoure chaque clé de doubles guillemets.",
+      "correction_automatique": false
+    },
+
+    {
+      "id": "JSON_004",
+      "type": "JSON",
+      "titre": "Accolade ou crochet non fermé",
+      "pattern": "parenthese_non_fermee",
+      "exemple_avant": "{\n  \"items\": [\n    \"fusil\",\n    \"casque\"\n  \n}",
+      "exemple_après": "{\n  \"items\": [\n    \"fusil\",\n    \"casque\"\n  ]\n}",
+      "message_novice": "Il manque une accolade } ou un crochet ] quelque part. Chaque { doit avoir son } et chaque [ doit avoir son ]. Vérifie que toutes sont bien fermées.",
+      "message_modder": "Déséquilibre détecté entre ouvrants et fermants. Vérifie le comptage des { } et [ ].",
+      "correction_automatique": false
+    },
+
+    {
+      "id": "XML_001",
+      "type": "XML",
+      "titre": "Balise auto-fermante mal écrite",
+      "pattern": "balise_auto_fermante",
+      "exemple_avant": "<current actual=\"0.45\" time=\"120\" duration=\"240\">",
+      "exemple_après": "<current actual=\"0.45\" time=\"120\" duration=\"240\" />",
+      "message_novice": "Cette balise ne contient rien à l'intérieur, elle devrait se fermer elle-même avec /> à la fin. Dans les fichiers DayZ comme cfgweather.xml, les balises comme <current>, <limits>, <timelimits> sont presque toujours auto-fermantes.",
+      "message_modder": "Balise auto-fermante sans />. Ajoute /> pour la fermer sur la même ligne.",
+      "correction_automatique": false
+    },
+
+    {
+      "id": "XML_002",
+      "type": "XML",
+      "titre": "Balise ouvrante sans fermeture",
+      "pattern": "balise_sans_fermeture",
+      "exemple_avant": "<overcast>\n    <current actual=\"0.45\" />\n    <limits min=\"0.0\" max=\"1.0\" />\n<!-- manque </overcast> -->",
+      "exemple_après": "<overcast>\n    <current actual=\"0.45\" />\n    <limits min=\"0.0\" max=\"1.0\" />\n</overcast>",
+      "message_novice": "Tu as ouvert une balise comme <overcast> mais tu ne l'as jamais fermée avec </overcast>. Chaque balise qui s'ouvre avec < doit se fermer avec </. DayZ va planter si elle reste ouverte.",
+      "message_modder": "Balise ouvrante sans fermeture correspondante. Le parseur XML remonte souvent cette erreur en fin de fichier — la vraie cause est probablement plus haut.",
+      "correction_automatique": false
+    },
+
+    {
+      "id": "XML_003",
+      "type": "XML",
+      "titre": "Attribut mal formé",
+      "pattern": "attribut_mal_forme",
+      "exemple_avant": "<limits min=\"0.0\" max=>",
+      "exemple_après": "<limits min=\"0.0\" max=\"1.0\" />",
+      "message_novice": "Un attribut est incomplet. Chaque attribut doit avoir un nom, un signe égal, puis une valeur entre guillemets. Comme ça : min=\"0.0\". Vérifie qu'aucun attribut n'est coupé.",
+      "message_modder": "Attribut sans valeur ou guillemets manquants détecté. Format attendu : nom=\"valeur\".",
+      "correction_automatique": false
+    },
+
+    {
+      "id": "XML_004",
+      "type": "XML",
+      "titre": "Commentaire non fermé",
+      "pattern": "commentaire_non_ferm",
+      "exemple_avant": "<!-- Condition initiale du brouillard\n<fog>\n    <current actual=\"0.05\" />",
+      "exemple_après": "<!-- Condition initiale du brouillard -->\n<fog>\n    <current actual=\"0.05\" />",
+      "message_novice": "Tu as ouvert un commentaire avec <!-- mais tu ne l'as jamais fermé avec -->. Tout ce qui suit est considéré comme du commentaire et sera ignoré par DayZ.",
+      "message_modder": "Commentaire non fermé. Tout le contenu après <!-- sera ignoré jusqu'au prochain -->.",
+      "correction_automatique": false
+    },
+
+    {
+      "id": "XML_005",
+      "type": "XML",
+      "titre": "Caractère spécial non échappé",
+      "pattern": "caractere_special",
+      "exemple_avant": "<message>Utilise & pour connecter</message>",
+      "exemple_après": "<message>Utilise &amp; pour connecter</message>",
+      "message_novice": "Le caractère & est spécial en XML. Si tu veux l'afficher dans un texte, tu dois écrire &amp; à la place. Même chose pour < qui devient &lt; et > qui devient &gt;.",
+      "message_modder": "Caractère & non échappé. Remplace par &amp;. Autres cas : < → &lt;, > → &gt;.",
+      "correction_automatique": true
+    },
+
+    {
+      "id": "XML_006",
+      "type": "XML",
+      "titre": "Balise fermante sans ouvrante correspondante",
+      "pattern": "balise_fermante_orpheline",
+      "exemple_avant": "<overcast>\n    <current actual=\"0.45\" />\n</fog>",
+      "exemple_après": "<overcast>\n    <current actual=\"0.45\" />\n</overcast>",
+      "message_novice": "Tu as une balise fermante comme </fog> mais elle ne correspond à aucune balise ouvrante. Vérifie que le nom entre </ et > correspond bien à une balise qui a été ouverte avant.",
+      "message_modder": "Mismatch tag détecté. La balise fermante ne correspond à aucune ouvrante en scope.",
+      "correction_automatique": false
+    }
+
+  ]
+}
