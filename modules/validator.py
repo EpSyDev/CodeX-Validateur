@@ -1,13 +1,14 @@
 """
 validator.py
 Valide un fichier XML ou JSON
-Retourne un objet structuré : valide ou pas, erreur matchée, ligne/colonne
+Retourne un objet structuré : valide ou pas, erreur matchée, ligne/colonne, ET correction auto si possible
 """
 
 import json
 import xml.etree.ElementTree as ET
 import re
 from errors_matcher import match_error
+from corrector import auto_correct, can_auto_correct
 
 
 # ==============================
@@ -21,10 +22,11 @@ from errors_matcher import match_error
 #     "error": {
 #         "line": int,
 #         "column": int,
-#         "message_brut": str,          → message du parseur (en anglais)
-#         "matched": dict ou None,      → entrée de errors_db si matchée
+#         "message_brut": str,
+#         "matched": dict ou None,
 #     },
-#     "formatted": str ou None          → code formaté si valide
+#     "formatted": str ou None,
+#     "corrected": str ou None          → NOUVEAU : contenu corrigé si auto-corrigeable
 # }
 
 
@@ -37,7 +39,8 @@ def validate_json(content):
         "valid": False,
         "file_type": "json",
         "error": None,
-        "formatted": None
+        "formatted": None,
+        "corrected": None
     }
 
     try:
@@ -48,12 +51,21 @@ def validate_json(content):
         return result
 
     except json.JSONDecodeError as e:
+        matched = match_error(content, e, "json")
+        
         result["error"] = {
             "line": e.lineno,
             "column": e.colno,
             "message_brut": e.msg,
-            "matched": match_error(content, e, "json")
+            "matched": matched
         }
+        
+        # NOUVEAU : Tenter la correction automatique si possible
+        if matched and can_auto_correct(matched):
+            correction = auto_correct(content, "json")
+            if correction["has_changes"]:
+                result["corrected"] = correction["corrected"]
+        
         return result
 
 
@@ -66,7 +78,8 @@ def validate_xml(content):
         "valid": False,
         "file_type": "xml",
         "error": None,
-        "formatted": None
+        "formatted": None,
+        "corrected": None
     }
 
     try:
@@ -78,12 +91,21 @@ def validate_xml(content):
 
     except ET.ParseError as e:
         line, col = e.position
+        matched = match_error(content, e, "xml")
+        
         result["error"] = {
             "line": line,
             "column": col,
             "message_brut": str(e),
-            "matched": match_error(content, e, "xml")
+            "matched": matched
         }
+        
+        # NOUVEAU : Tenter la correction automatique si possible
+        if matched and can_auto_correct(matched):
+            correction = auto_correct(content, "xml")
+            if correction["has_changes"]:
+                result["corrected"] = correction["corrected"]
+        
         return result
 
 
@@ -132,5 +154,6 @@ def validate(content, file_type):
             "message_brut": "Type de fichier non supporté",
             "matched": None
         },
-        "formatted": None
+        "formatted": None,
+        "corrected": None
     }
