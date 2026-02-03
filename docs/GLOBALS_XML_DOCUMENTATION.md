@@ -973,17 +973,6 @@
 
 ---
 
-**📝 Document créé par Codex - L'outil pour la communauté DayZ FR**
+**📝 Document créé par CodeX - L'outil pour la communauté DayZ FR**
 **Version : 1.0 - Basé sur DayZ 1.28**
 **Dernière mise à jour : 2025**
-
----
-
-## 🎯 Prochaines étapes
-
-1. ✅ Documentation globals.xml complétée
-2. 📄 Dernier fichier générique :
-   - messages.xml
-3. 🗺️ Puis fichiers par map (zombie_territories, cfgeventspawns)
-
-**31 variables pour contrôler TOUT le comportement du serveur ! 🎛️**
