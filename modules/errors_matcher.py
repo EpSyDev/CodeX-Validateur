@@ -2,6 +2,7 @@
 errors_matcher.py
 Matche une erreur détectée par le validateur avec errors_db.json
 Retourne le bon message, les exemples, et le niveau (novice/modder)
+✨ AMÉLIORÉ : Extrait le nom exact des balises problématiques
 """
 
 import json
@@ -25,6 +26,82 @@ def get_errors_db():
     if _ERRORS_DB is None:
         _ERRORS_DB = load_errors_db()
     return _ERRORS_DB
+
+
+# ==============================
+# ✨ NOUVEAU : EXTRACTION NOM BALISE
+# ==============================
+def extract_tag_name_from_error(error_msg, content, line_num):
+    """
+    Extrait le nom de la balise problématique depuis le message d'erreur ou le contenu.
+    
+    Args:
+        error_msg: Message d'erreur du parseur
+        content: Contenu complet du fichier
+        line_num: Numéro de ligne de l'erreur
+    
+    Returns:
+        str: Nom de la balise ou None
+    """
+    # Essayer d'extraire depuis le message d'erreur
+    # Ex: "mismatched tag: line 3, column 2" ou "Opening and ending tag mismatch: territory"
+    tag_match = re.search(r'tag[:\s]+(\w+)', error_msg, re.IGNORECASE)
+    if tag_match:
+        return tag_match.group(1)
+    
+    # Si pas dans le message, chercher dans la ligne problématique
+    lines = content.split('\n')
+    if 0 < line_num <= len(lines):
+        problem_line = lines[line_num - 1]
+        
+        # Chercher balise fermante
+        closing_tag = re.search(r'</(\w+)>', problem_line)
+        if closing_tag:
+            return closing_tag.group(1)
+        
+        # Chercher balise ouvrante
+        opening_tag = re.search(r'<(\w+)', problem_line)
+        if opening_tag:
+            return opening_tag.group(1)
+    
+    return None
+
+
+def find_unclosed_tag_name(content, error_line):
+    """
+    Trouve le nom de la balise qui n'est pas fermée.
+    
+    Args:
+        content: Contenu XML complet
+        error_line: Ligne où l'erreur est détectée
+    
+    Returns:
+        str: Nom de la balise non fermée ou None
+    """
+    lines = content.split('\n')
+    open_tags = []
+    
+    # Parser jusqu'à la ligne d'erreur
+    for i, line in enumerate(lines[:error_line], start=1):
+        # Ignorer commentaires
+        line_clean = re.sub(r'<!--.*?-->', '', line)
+        
+        # Ignorer balises auto-fermantes
+        line_clean = re.sub(r'<[^>]+/>', '', line_clean)
+        
+        # Trouver balises fermantes
+        closing_tags = re.findall(r'</(\w+)>', line_clean)
+        for tag in closing_tags:
+            if open_tags and open_tags[-1] == tag:
+                open_tags.pop()
+        
+        # Trouver balises ouvrantes
+        opening_tags = re.findall(r'<(\w+)(?:\s[^>]*)?>(?![^<]*/>)', line_clean)
+        for tag in opening_tags:
+            open_tags.append(tag)
+    
+    # La dernière balise ouverte = balise non fermée
+    return open_tags[-1] if open_tags else None
 
 
 # ==============================
@@ -64,8 +141,10 @@ def match_xml_error(content, error):
     """
     Prend le contenu du fichier + l'erreur ParseError
     Retourne l'entrée correspondante de errors_db ou None
+    ✨ AMÉLIORÉ : Ajoute le nom de la balise dans le résultat
     """
     msg = str(error).lower()
+    error_line = error.position[0] if hasattr(error, 'position') else 0
 
     # Commentaire non fermé (vérifie en premier — bloque tout le reste)
     if _check_unclosed_comment(content):
@@ -75,13 +154,40 @@ def match_xml_error(content, error):
     if re.search(r'&(?!(amp|lt|gt|quot|apos);)', content):
         return _get_by_id("XML_005")
 
-    # Mismatch tag (balise fermante qui ne correspond pas)
-    if "mismatched tag" in msg:
-        return _get_by_id("XML_006")
+    # ✨ Mismatch tag (balise fermante qui ne correspond pas)
+    if "mismatched tag" in msg or "opening and ending tag mismatch" in msg:
+        matched = _get_by_id("XML_006")
+        if matched:
+            tag_name = extract_tag_name_from_error(str(error), content, error_line)
+            if tag_name:
+                # Enrichir les messages avec le nom exact
+                matched = matched.copy()
+                matched["message_novice"] = matched["message_novice"].replace(
+                    "comme </fog>", 
+                    f"</{tag_name}>"
+                )
+                matched["message_modder"] = matched["message_modder"] + f" Balise problématique : <{tag_name}>"
+                matched["tag_name"] = tag_name
+        return matched
 
-    # Balise ouvrante sans fermeture
+    # ✨ Balise ouvrante sans fermeture
     if "no element found" in msg or "unclosed token" in msg:
-        return _get_by_id("XML_002")
+        matched = _get_by_id("XML_002")
+        if matched:
+            tag_name = find_unclosed_tag_name(content, error_line)
+            if tag_name:
+                # Enrichir les messages avec le nom exact
+                matched = matched.copy()
+                matched["message_novice"] = matched["message_novice"].replace(
+                    "<overcast>",
+                    f"<{tag_name}>"
+                ).replace(
+                    "</overcast>",
+                    f"</{tag_name}>"
+                )
+                matched["message_modder"] = matched["message_modder"] + f" Balise non fermée : <{tag_name}>"
+                matched["tag_name"] = tag_name
+        return matched
 
     # Attribut mal formé
     if "not well-formed" in msg or "syntax error" in msg:
@@ -126,7 +232,7 @@ def _check_missing_self_close(content):
     # Liste des balises connues comme auto-fermantes dans DayZ
     self_closing_tags = [
         "current", "limits", "timelimits", "changelimits",
-        "thresholds", "storm", "item", "type"
+        "thresholds", "storm", "item", "type", "zone"
     ]
     for tag in self_closing_tags:
         # Cherche une balise ouverte sans /> ni </tag>
@@ -163,6 +269,7 @@ def match_error(content, error, file_type):
     Retourne :
         dict avec : id, titre, message_novice, message_modder,
                     exemple_avant, exemple_après, correction_automatique
+                    ✨ + tag_name si balise détectée
         ou None si rien ne matche
     """
     if file_type == "json":
