@@ -28,6 +28,101 @@ def get_errors_db():
 
 
 # ==============================
+# ✨ NOUVEAU : DÉTECTION BALISES NON FERMÉES
+# ==============================
+def find_unclosed_tags(content):
+    """
+    Détecte les balises XML non fermées.
+    
+    Retourne:
+        list: [(tag_name, line_number, position), ...]
+    """
+    # Stack pour tracker les balises ouvertes
+    open_tags = []
+    unclosed = []
+    
+    # Pattern pour balises
+    # Ouvrante: <tag ...> ou <tag>
+    # Fermante: </tag>
+    # Auto-fermante: <tag ... />
+    
+    lines = content.split('\n')
+    
+    for line_num, line in enumerate(lines, start=1):
+        # Ignorer commentaires
+        line_clean = re.sub(r'<!--.*?-->', '', line)
+        
+        # Trouver balises auto-fermantes (on les ignore)
+        line_clean = re.sub(r'<[^>]+/>', '', line_clean)
+        
+        # Trouver balises fermantes
+        closing_tags = re.findall(r'</(\w+)>', line_clean)
+        for tag in closing_tags:
+            if open_tags and open_tags[-1][0] == tag:
+                open_tags.pop()
+            # Sinon c'est une balise fermante orpheline (autre erreur)
+        
+        # Trouver balises ouvrantes
+        opening_tags = re.findall(r'<(\w+)(?:\s[^>]*)?>(?![^<]*/>)', line_clean)
+        for tag in opening_tags:
+            open_tags.append((tag, line_num, line))
+    
+    # Ce qui reste dans open_tags = balises non fermées
+    return open_tags
+
+
+# ==============================
+# ✨ NOUVEAU : CORRECTION BALISES NON FERMÉES
+# ==============================
+def fix_unclosed_tags(content):
+    """
+    Corrige automatiquement les balises non fermées en ajoutant les balises fermantes.
+    
+    Retourne:
+        tuple: (corrected_content, list_of_fixes)
+    """
+    unclosed = find_unclosed_tags(content)
+    
+    if not unclosed:
+        return content, []
+    
+    lines = content.split('\n')
+    fixes = []
+    
+    # Parcourir les balises non fermées (de la plus récente à la plus ancienne)
+    for tag_name, line_num, original_line in reversed(unclosed):
+        # Trouver où insérer la balise fermante
+        # On cherche la prochaine balise ouvrante du même niveau ou la fin du fichier
+        
+        insert_line = None
+        indent = len(original_line) - len(original_line.lstrip())
+        
+        # Chercher la prochaine balise de même niveau ou niveau supérieur
+        for i in range(line_num, len(lines)):
+            current_line = lines[i]
+            current_indent = len(current_line) - len(current_line.lstrip())
+            
+            # Si on trouve une balise ouvrante au même niveau, on insère avant
+            if current_indent <= indent and re.search(r'<\w+', current_line):
+                insert_line = i
+                break
+        
+        # Si pas trouvé, insérer à la fin
+        if insert_line is None:
+            insert_line = len(lines)
+        
+        # Créer la balise fermante avec la bonne indentation
+        closing_tag = ' ' * indent + f'</{tag_name}>'
+        
+        # Insérer la balise fermante
+        lines.insert(insert_line, closing_tag)
+        
+        fixes.append(f"Ajout de </{tag_name}> à la ligne {insert_line + 1}")
+    
+    return '\n'.join(lines), fixes
+
+
+# ==============================
 # FONCTION PRINCIPALE
 # ==============================
 def auto_correct(content, file_type):
@@ -103,12 +198,11 @@ def _correct_xml(content):
         corrected = re.sub(r'&(?!(amp|lt|gt|quot|apos);)', '&amp;', corrected)
         applied.append(f"Échappement de {unescaped_count} caractère(s) & → &amp;")
     
-    # On ne corrige PAS automatiquement :
-    # - Balises ouvrantes sans fermeture (trop risqué — où fermer ?)
-    # - Commentaires non fermés (trop risqué — où fermer ?)
-    # - Balises auto-fermantes (trop risqué — /> ou </tag> ?)
-    # - Attributs mal formés (trop risqué — quelle valeur mettre ?)
-    # - Mismatch tags (trop risqué — laquelle est correcte ?)
+    # ✨ 2. NOUVEAU : Balises non fermées
+    corrected_with_tags, tag_fixes = fix_unclosed_tags(corrected)
+    if tag_fixes:
+        corrected = corrected_with_tags
+        applied.extend(tag_fixes)
     
     has_changes = len(applied) > 0
     
@@ -130,10 +224,14 @@ def can_auto_correct(error_matched):
         error_matched → entrée de errors_db (dict) ou None
     
     Retourne :
-        bool → True si correction_automatique est à True
+        bool → True si correction_automatique est à True OU si c'est une balise non fermée
     """
     if not error_matched:
         return False
+    
+    # ✨ NOUVEAU : Les balises non fermées sont maintenant auto-corrigeables
+    if error_matched.get("id") in ["XML_002", "XML_006"]:
+        return True
     
     return error_matched.get("correction_automatique", False)
 
@@ -189,11 +287,6 @@ def suggest_manual_fixes(content, file_type, error_matched):
             manual_steps.append("Ajoute /> à la fin de la balise")
             manual_steps.append("Exemple : <current actual=\"0.45\" />")
         
-        elif "XML_002" in error_id:  # Balise sans fermeture
-            manual_steps.append("Trouve la balise ouvrante signalée")
-            manual_steps.append("Ajoute la balise fermante correspondante")
-            manual_steps.append("Exemple : </overcast> après le contenu")
-        
         elif "XML_003" in error_id:  # Attribut mal formé
             manual_steps.append("Vérifie que chaque attribut a une valeur")
             manual_steps.append("Format : nom=\"valeur\"")
@@ -201,10 +294,6 @@ def suggest_manual_fixes(content, file_type, error_matched):
         elif "XML_004" in error_id:  # Commentaire non fermé
             manual_steps.append("Trouve le commentaire <!-- ouvert")
             manual_steps.append("Ajoute --> pour le fermer")
-        
-        elif "XML_006" in error_id:  # Mismatch tag
-            manual_steps.append("Vérifie que les balises ouvrantes/fermantes correspondent")
-            manual_steps.append("La balise fermante doit avoir le même nom que l'ouvrante")
         
         elif "JSON_003" in error_id:  # Clé sans guillemets
             manual_steps.append("Entoure chaque clé de guillemets doubles")
