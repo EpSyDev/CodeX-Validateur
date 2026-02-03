@@ -139,13 +139,16 @@ st.markdown("""
 # ==============================
 with st.sidebar:
     st.markdown("### 📚 Documentation")
-    st.markdown("""
+    
+    github_base = "https://github.com/nicolassmt/codex-validateur/blob/main/docs/"
+    
+    st.markdown(f"""
     **Fichiers DayZ documentés :**
-    - 📄 [types.xml](docs/TYPES_XML_DOCUMENTATION.md)
-    - 🚁 [events.xml](docs/EVENTS_XML_DOCUMENTATION.md)
-    - 💰 [economy.xml](docs/ECONOMY_XML_DOCUMENTATION.md)
-    - 🌐 [globals.xml](docs/GLOBALS_XML_DOCUMENTATION.md)
-    - 💬 [messages.xml](docs/MESSAGES_XML_DOCUMENTATION.md)
+    - 📄 [types.xml]({github_base}TYPES_XML_DOCUMENTATION.md)
+    - 🚁 [events.xml]({github_base}EVENTS_XML_DOCUMENTATION.md)
+    - 💰 [economy.xml]({github_base}ECONOMY_XML_DOCUMENTATION.md)
+    - 🌐 [globals.xml]({github_base}GLOBALS_XML_DOCUMENTATION.md)
+    - 💬 [messages.xml]({github_base}MESSAGES_XML_DOCUMENTATION.md)
     """)
     
     st.markdown("---")
