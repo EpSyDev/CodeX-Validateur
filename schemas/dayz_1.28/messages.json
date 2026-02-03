@@ -1,0 +1,261 @@
+{
+  "version": "1.28",
+  "file_type": "messages.xml",
+  "description": "Schéma de validation pour messages.xml DayZ 1.28 - Messages automatiques serveur",
+  "last_updated": "2025-01-30",
+  
+  "structure": {
+    "root_element": "messages",
+    "child_element": "message",
+    "multiple_children": true
+  },
+  
+  "message_element": {
+    "children": {
+      "text": {
+        "required": true,
+        "type": "string",
+        "description": "Contenu du message à afficher",
+        "placeholders": {
+          "#name": "Nom du serveur",
+          "#tmin": "Temps restant en minutes (avec deadline)",
+          "#tsec": "Temps restant en secondes (avec deadline)"
+        }
+      },
+      "delay": {
+        "required": false,
+        "type": "integer",
+        "min": 0,
+        "max": 1440,
+        "description": "Délai avant affichage (minutes)"
+      },
+      "repeat": {
+        "required": false,
+        "type": "integer",
+        "min": 1,
+        "max": 1440,
+        "description": "Répétition du message (minutes)"
+      },
+      "deadline": {
+        "required": false,
+        "type": "integer",
+        "min": 1,
+        "max": 10080,
+        "description": "Compte à rebours (minutes)"
+      },
+      "onconnect": {
+        "required": false,
+        "type": "boolean_int",
+        "values": [0, 1],
+        "default": 0,
+        "description": "Déclenché à la connexion joueur"
+      },
+      "shutdown": {
+        "required": false,
+        "type": "boolean_int",
+        "values": [0, 1],
+        "default": 0,
+        "description": "Arrête le serveur après deadline"
+      }
+    }
+  },
+  
+  "validation_rules": {
+    "text_required": {
+      "description": "La balise <text> est obligatoire",
+      "error_message_fr": "Message sans balise <text>. Chaque message doit contenir du texte.",
+      "severity": "error"
+    },
+    "placeholder_without_deadline": {
+      "description": "Placeholder #tmin/#tsec sans deadline",
+      "error_message_fr": "Message utilise #tmin ou #tsec mais n'a pas de <deadline>. Ces placeholders nécessitent un compte à rebours.",
+      "severity": "error"
+    },
+    "shutdown_without_deadline": {
+      "description": "shutdown=1 sans deadline",
+      "error_message_fr": "Message avec shutdown='1' mais sans <deadline>. Un shutdown nécessite un compte à rebours.",
+      "severity": "error"
+    },
+    "negative_value": {
+      "description": "Valeur négative détectée",
+      "error_message_fr": "Balise '{tag}': valeur négative ({value}). Les timers doivent être positifs.",
+      "severity": "error"
+    },
+    "onconnect_invalid_value": {
+      "description": "onconnect doit être 0 ou 1",
+      "error_message_fr": "onconnect doit être 0 ou 1, actuellement : {value}",
+      "severity": "error"
+    },
+    "shutdown_invalid_value": {
+      "description": "shutdown doit être 0 ou 1",
+      "error_message_fr": "shutdown doit être 0 ou 1, actuellement : {value}",
+      "severity": "error"
+    },
+    "repeat_too_short": {
+      "description": "repeat < 10 minutes (spam)",
+      "error_message_fr": "Message avec repeat={value} minutes. Valeur < 10 peut spammer les joueurs. Recommandé : ≥ 15 minutes.",
+      "severity": "warning"
+    },
+    "deadline_with_shutdown_warning": {
+      "description": "deadline sans shutdown explicite",
+      "error_message_fr": "Message avec <deadline> mais sans <shutdown> explicite. Le serveur va-t-il s'arrêter ou est-ce juste informatif ?",
+      "severity": "info"
+    },
+    "text_too_long": {
+      "description": "Texte très long (> 200 caractères)",
+      "error_message_fr": "Message de {length} caractères. Les messages longs (> 200) peuvent être tronqués in-game.",
+      "severity": "warning"
+    }
+  },
+  
+  "common_patterns": {
+    "welcome_message": {
+      "description": "Message de bienvenue à la connexion",
+      "example": {
+        "onconnect": 1,
+        "text": "Bienvenue sur #name !"
+      }
+    },
+    "delayed_rules": {
+      "description": "Règles affichées après X minutes",
+      "example": {
+        "delay": 2,
+        "onconnect": 1,
+        "text": "Règles du serveur : ..."
+      }
+    },
+    "periodic_reminder": {
+      "description": "Rappel périodique (Discord, site, etc.)",
+      "example": {
+        "repeat": 30,
+        "text": "Rejoignez notre Discord : ..."
+      }
+    },
+    "scheduled_restart": {
+      "description": "Restart automatique programmé",
+      "example": {
+        "deadline": 1440,
+        "shutdown": 1,
+        "text": "#name redémarrera dans #tmin minutes"
+      }
+    },
+    "event_countdown": {
+      "description": "Compte à rebours événement (sans shutdown)",
+      "example": {
+        "deadline": 120,
+        "text": "Événement PvP dans #tmin minutes !"
+      }
+    },
+    "onconnect_with_repeat": {
+      "description": "Message à la connexion puis répété",
+      "example": {
+        "delay": 5,
+        "repeat": 60,
+        "onconnect": 1,
+        "text": "Site web : www.exemple.com"
+      }
+    }
+  },
+  
+  "common_errors": {
+    "messages_not_showing": {
+      "symptom": "Messages n'apparaissent pas in-game",
+      "causes": [
+        "Syntaxe XML invalide",
+        "Fichier mal encodé (pas UTF-8)",
+        "Balise <text> manquante"
+      ],
+      "solution": "Valider la syntaxe XML et l'encodage UTF-8"
+    },
+    "server_not_shutting_down": {
+      "symptom": "Serveur ne s'arrête pas après deadline",
+      "cause": "<shutdown>1</shutdown> manquant",
+      "solution": "Ajouter <shutdown>1</shutdown> au message"
+    },
+    "spam_players": {
+      "symptom": "Joueurs se plaignent de spam",
+      "cause": "<repeat> trop court (< 10 minutes)",
+      "solution": "Augmenter repeat à 20-30 minutes minimum"
+    },
+    "accents_broken": {
+      "symptom": "Accents affichés incorrectement",
+      "cause": "Encodage incorrect du fichier",
+      "solution": "Sauvegarder en UTF-8 avec BOM"
+    }
+  },
+  
+  "best_practices": {
+    "do": [
+      "Utiliser UTF-8 pour les accents",
+      "Messages courts (< 100 caractères)",
+      "repeat ≥ 15 minutes pour éviter spam",
+      "Séquence de bienvenue progressive (immédiat, +2min, +10min)",
+      "Prévoir restarts automatiques avec deadline + shutdown"
+    ],
+    "dont": [
+      "repeat < 10 minutes (spam)",
+      "Messages > 200 caractères (tronqués)",
+      "Trop de messages simultanés (> 10)",
+      "Placeholders #tmin/#tsec sans deadline",
+      "Oublier shutdown=1 pour les restarts automatiques"
+    ]
+  },
+  
+  "tips": {
+    "general": [
+      "Les messages peuvent inclure des emojis (💬, ⚠️, etc.)",
+      "Tester l'affichage in-game après modifications",
+      "Fichier peut être hot-reload (pas de restart nécessaire selon version)"
+    ],
+    "timing": [
+      "delay = délai AVANT le premier affichage",
+      "repeat = répétition PÉRIODIQUE",
+      "deadline = compte à rebours DÉCROISSANT"
+    ],
+    "placeholders": [
+      "#name remplacé par le nom du serveur",
+      "#tmin pour minutes restantes (deadline requis)",
+      "#tsec pour secondes restantes (deadline requis)"
+    ]
+  },
+  
+  "example_configs": {
+    "minimal": {
+      "description": "Configuration minimale (bienvenue + restart)",
+      "messages": [
+        {
+          "onconnect": 1,
+          "text": "Bienvenue sur #name !"
+        },
+        {
+          "deadline": 1440,
+          "shutdown": 1,
+          "text": "#name redémarrera dans #tmin minutes"
+        }
+      ]
+    },
+    "community_server": {
+      "description": "Serveur communautaire complet",
+      "messages": [
+        {
+          "onconnect": 1,
+          "text": "Bienvenue sur #name"
+        },
+        {
+          "delay": 2,
+          "onconnect": 1,
+          "text": "Règles : www.exemple.com/regles"
+        },
+        {
+          "repeat": 30,
+          "text": "Discord : discord.gg/EXAMPLE"
+        },
+        {
+          "deadline": 720,
+          "shutdown": 1,
+          "text": "Restart dans #tmin min"
+        }
+      ]
+    }
+  }
+}

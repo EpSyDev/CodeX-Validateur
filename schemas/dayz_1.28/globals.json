@@ -1,0 +1,321 @@
+{
+  "version": "1.28",
+  "file_type": "globals.xml",
+  "description": "Schéma de validation pour globals.xml DayZ 1.28 - Variables globales serveur",
+  "last_updated": "2025-01-30",
+  
+  "structure": {
+    "root_element": "variables",
+    "child_element": "var",
+    "multiple_children": true,
+    "total_variables": 31
+  },
+  
+  "var_element": {
+    "self_closing": true,
+    "required_attributes": ["name", "type", "value"],
+    "attributes": {
+      "name": {
+        "type": "string",
+        "description": "Nom de la variable",
+        "validation": "must_match_known_variables"
+      },
+      "type": {
+        "type": "enum",
+        "values": ["0", "1"],
+        "description": "Type de variable : 0=integer, 1=float"
+      },
+      "value": {
+        "type": "string",
+        "description": "Valeur de la variable (format selon type)"
+      }
+    }
+  },
+  
+  "known_variables": {
+    "AnimalMaxCount": {
+      "type": "0",
+      "default": "200",
+      "min": 0,
+      "max": 5000,
+      "description": "Nombre maximum d'animaux simultanés"
+    },
+    "CleanupAvoidance": {
+      "type": "0",
+      "default": "100",
+      "min": 0,
+      "max": 500,
+      "description": "Distance d'évitement du cleanup (mètres)"
+    },
+    "CleanupLifetimeDeadAnimal": {
+      "type": "0",
+      "default": "1200",
+      "min": 0,
+      "max": 7200,
+      "description": "Durée de vie cadavres animaux (secondes)"
+    },
+    "CleanupLifetimeDeadInfected": {
+      "type": "0",
+      "default": "330",
+      "min": 0,
+      "max": 3600,
+      "description": "Durée de vie cadavres zombies (secondes)"
+    },
+    "CleanupLifetimeDeadPlayer": {
+      "type": "0",
+      "default": "3600",
+      "min": 0,
+      "max": 7200,
+      "description": "Durée de vie cadavres joueurs (secondes)"
+    },
+    "CleanupLifetimeDefault": {
+      "type": "0",
+      "default": "45",
+      "min": 0,
+      "max": 180,
+      "description": "Durée de vie par défaut des objets (minutes)"
+    },
+    "CleanupLifetimeLimit": {
+      "type": "0",
+      "default": "50",
+      "min": 0,
+      "max": 180,
+      "description": "Limite supérieure de cleanup (minutes)"
+    },
+    "CleanupLifetimeRuined": {
+      "type": "0",
+      "default": "330",
+      "min": 0,
+      "max": 3600,
+      "description": "Durée de vie items ruinés (secondes)"
+    },
+    "FlagRefreshFrequency": {
+      "type": "0",
+      "default": "432000",
+      "min": 0,
+      "max": 2592000,
+      "description": "Fréquence rafraîchissement drapeaux (secondes = 5 jours)"
+    },
+    "FlagRefreshMaxDuration": {
+      "type": "0",
+      "default": "3456000",
+      "min": 0,
+      "max": 7776000,
+      "description": "Durée max avant despawn base inactive (secondes = 40 jours)"
+    },
+    "FoodDecay": {
+      "type": "0",
+      "default": "1",
+      "min": 0,
+      "max": 1,
+      "description": "Décomposition nourriture activée (0/1)"
+    },
+    "IdleModeCountdown": {
+      "type": "0",
+      "default": "60",
+      "min": 0,
+      "max": 300,
+      "description": "Temps avant activation mode idle (secondes)"
+    },
+    "IdleModeStartup": {
+      "type": "0",
+      "default": "1",
+      "min": 0,
+      "max": 1,
+      "description": "Mode idle au démarrage (0/1)"
+    },
+    "InitialSpawn": {
+      "type": "0",
+      "default": "100",
+      "min": 0,
+      "max": 100,
+      "description": "Pourcentage loot au premier boot"
+    },
+    "LootDamageMax": {
+      "type": "1",
+      "default": "0.82",
+      "min": 0.0,
+      "max": 1.0,
+      "description": "Durabilité maximale loot (0.0-1.0)"
+    },
+    "LootDamageMin": {
+      "type": "1",
+      "default": "0.0",
+      "min": 0.0,
+      "max": 1.0,
+      "description": "Durabilité minimale loot (0.0-1.0)"
+    },
+    "LootProxyPlacement": {
+      "type": "0",
+      "default": "1",
+      "min": 0,
+      "max": 1,
+      "description": "Placement proxy du loot (0/1)"
+    },
+    "LootSpawnAvoidance": {
+      "type": "0",
+      "default": "100",
+      "min": 0,
+      "max": 500,
+      "description": "Distance minimale spawn loot (mètres)"
+    },
+    "RespawnAttempt": {
+      "type": "0",
+      "default": "2",
+      "min": 0,
+      "max": 10,
+      "description": "Nombre de tentatives de respawn par cycle"
+    },
+    "RespawnLimit": {
+      "type": "0",
+      "default": "20",
+      "min": 0,
+      "max": 100,
+      "description": "Nombre max items respawn par cycle"
+    },
+    "RespawnTypes": {
+      "type": "0",
+      "default": "12",
+      "min": 0,
+      "max": 50,
+      "description": "Nombre de types traités par cycle"
+    },
+    "RestartSpawn": {
+      "type": "0",
+      "default": "0",
+      "min": 0,
+      "max": 100,
+      "description": "Pourcentage boost loot au restart"
+    },
+    "SpawnInitial": {
+      "type": "0",
+      "default": "1200",
+      "min": 0,
+      "max": 3600,
+      "description": "Durée spawn initial (secondes)"
+    },
+    "TimeHopping": {
+      "type": "0",
+      "default": "60",
+      "min": 0,
+      "max": 600,
+      "description": "Pénalité server hopping (secondes)"
+    },
+    "TimeLogin": {
+      "type": "0",
+      "default": "15",
+      "min": 0,
+      "max": 60,
+      "description": "Temps avant reconnexion (secondes)"
+    },
+    "TimeLogout": {
+      "type": "0",
+      "default": "15",
+      "min": 0,
+      "max": 60,
+      "description": "Temps perso reste après déco (secondes)"
+    },
+    "TimePenalty": {
+      "type": "0",
+      "default": "20",
+      "min": 0,
+      "max": 60,
+      "description": "Pénalité de temps générale (secondes)"
+    },
+    "WorldWetTempUpdate": {
+      "type": "0",
+      "default": "1",
+      "min": 0,
+      "max": 1,
+      "description": "Mise à jour température/humidité (0/1)"
+    },
+    "ZombieMaxCount": {
+      "type": "0",
+      "default": "1000",
+      "min": 0,
+      "max": 5000,
+      "description": "Nombre maximum de zombies simultanés"
+    },
+    "ZoneSpawnDist": {
+      "type": "0",
+      "default": "300",
+      "min": 0,
+      "max": 1000,
+      "description": "Distance max spawn autour joueur (mètres)"
+    }
+  },
+  
+  "validation_rules": {
+    "type_value_match": {
+      "description": "Le type doit correspondre à la valeur",
+      "error_message_fr": "Variable '{name}': type={type} mais la valeur '{value}' ne correspond pas",
+      "severity": "error"
+    },
+    "loot_damage_min_lte_max": {
+      "description": "LootDamageMin doit être ≤ LootDamageMax",
+      "error_message_fr": "LootDamageMin ({min}) ne peut pas être supérieur à LootDamageMax ({max})",
+      "severity": "error"
+    },
+    "flag_refresh_frequency_lte_max_duration": {
+      "description": "FlagRefreshFrequency doit être < FlagRefreshMaxDuration",
+      "error_message_fr": "FlagRefreshFrequency ({freq}) doit être inférieur à FlagRefreshMaxDuration ({max})",
+      "severity": "warning"
+    },
+    "negative_value_warning": {
+      "description": "Valeur négative détectée",
+      "error_message_fr": "Variable '{name}': valeur négative ({value}) détectée. Est-ce voulu ?",
+      "severity": "warning"
+    },
+    "value_out_of_range": {
+      "description": "Valeur hors des limites recommandées",
+      "error_message_fr": "Variable '{name}': valeur {value} hors de la plage recommandée ({min}-{max})",
+      "severity": "warning"
+    },
+    "unknown_variable": {
+      "description": "Variable inconnue détectée",
+      "error_message_fr": "Variable '{name}': nom inconnu. Ce n'est pas une variable vanilla standard.",
+      "severity": "info"
+    }
+  },
+  
+  "common_errors": {
+    "animals_too_high": {
+      "symptom": "Serveur lag avec beaucoup d'animaux",
+      "cause": "AnimalMaxCount trop élevé (> 400)",
+      "solution": "Réduire AnimalMaxCount à 100-200"
+    },
+    "zombies_too_high": {
+      "symptom": "Serveur lag avec beaucoup de zombies",
+      "cause": "ZombieMaxCount trop élevé (> 1500)",
+      "solution": "Réduire ZombieMaxCount à 500-1000"
+    },
+    "cleanup_too_aggressive": {
+      "symptom": "Items despawnent trop vite",
+      "cause": "CleanupLifetimeDefault trop court",
+      "solution": "Augmenter CleanupLifetimeDefault (45-90)"
+    },
+    "loot_damage_incoherent": {
+      "symptom": "Erreur de validation",
+      "cause": "LootDamageMin > LootDamageMax",
+      "solution": "S'assurer que LootDamageMin ≤ LootDamageMax"
+    }
+  },
+  
+  "tips": {
+    "performance": [
+      "AnimalMaxCount et ZombieMaxCount < 500 = meilleure performance",
+      "CleanupLifetimeDefault court (20-30) = map propre mais items despawnent vite",
+      "ZoneSpawnDist réduit (200-250) = moins d'entités actives"
+    ],
+    "gameplay": [
+      "FoodDecay=0 pour mode casual (nourriture ne pourrit pas)",
+      "TimeLogout élevé (30-60) = anti combat-logging",
+      "LootDamageMax=1.0 pour loot neuf (plus facile pour débutants)"
+    ],
+    "balancing": [
+      "Comparer toujours avec les valeurs vanilla de référence",
+      "Ajuster progressivement (±20% à la fois)",
+      "Tester sur 24h avant finaliser"
+    ]
+  }
+}
