@@ -785,27 +785,6 @@
 
 ---
 
-**📝 Document créé par Codex - L'outil pour la communauté DayZ FR**
+**📝 Document créé par CodeX - L'outil pour la communauté DayZ FR**
 **Version : 1.0 - Basé sur DayZ 1.28**
 **Dernière mise à jour : 2025**
-
----
-
-## 🎯 Récapitulatif
-
-**Messages.xml en bref :**
-- ✅ Fichier simple mais puissant
-- ✅ Permet communication automatique avec joueurs
-- ✅ Restart automatiques programmables
-- ✅ Hot-reload (pas de restart serveur nécessaire)
-- ✅ Placeholders pour dynamisme
-
-**Fichiers génériques TOUS DOCUMENTÉS ! 🎉**
-
-1. ✅ types.xml
-2. ✅ events.xml
-3. ✅ economy.xml
-4. ✅ globals.xml
-5. ✅ messages.xml
-
-**Prochaine étape : Fichiers PAR MAP ! 🗺️**
