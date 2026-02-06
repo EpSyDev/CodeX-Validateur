@@ -120,9 +120,9 @@ def apply_map_offsets(zones, map_name):
     
     # Offsets de calibration par carte (en pixels)
     MAP_OFFSETS = {
-        'Chernarus': {'x': -26, 'z': 17},    # ✅ VALIDÉ (Caserne pompiers)
-        'Livonia':   {'x': 206, 'z': -73},   # ✅ VALIDÉ (Topolin)
-        'Sakhal':    {'x': 0, 'z': -21}      # ✅ VALIDÉ (Caserne ouest)
+        'Chernarus': {'x': -26, 'z': 1017},   # ✅ AJUSTÉ (décalage vers le sud)
+        'Livonia':   {'x': 206, 'z': -73},    # ✅ VALIDÉ (Topolin)
+        'Sakhal':    {'x': 0, 'z': -21}       # ✅ VALIDÉ (Caserne ouest)
     }
     
     offsets = MAP_OFFSETS.get(map_name, {'x': 0, 'z': 0})
@@ -142,12 +142,13 @@ def apply_map_offsets(zones, map_name):
 def generate_xml(zones):
     """Génère le XML depuis la liste de zones"""
     territories = {}
+    
+    # Regrouper TOUTES les zones par couleur (actives ET inactives)
     for zone in zones:
-        if zone['active']:
-            color = zone['color']
-            if color not in territories:
-                territories[color] = []
-            territories[color].append(zone)
+        color = zone['color']
+        if color not in territories:
+            territories[color] = []
+        territories[color].append(zone)
     
     xml_lines = ['<?xml version="1.0" encoding="UTF-8"?>']
     xml_lines.append('<territory-type>')
@@ -159,7 +160,7 @@ def generate_xml(zones):
                 f'        <zone name="{zone["name"]}" '
                 f'smin="{zone["smin"]}" smax="{zone["smax"]}" '
                 f'dmin="{zone["dmin"]}" dmax="{zone["dmax"]}" '
-                f'x="{zone["x"]}" z="{zone["z"]}" r="{zone["r"]}"/>'
+                f'x="{zone["x"]:.2f}" z="{zone["z"]:.2f}" r="{zone["r"]:.2f}"/>'
             )
         xml_lines.append('    </territory>')
     
@@ -219,7 +220,7 @@ def create_map(zones_data, map_name, map_size, img_path):
             mode='markers',
             name=zone_type,
             marker=dict(
-                size=df_type['r'] / 5,
+                size=df_type['r'] / 10,  # Divisé par 10 au lieu de 5 (marqueurs 2x plus petits)
                 color=get_zone_color(zone_type),
                 opacity=0.9,
                 line=dict(width=2, color='white')
