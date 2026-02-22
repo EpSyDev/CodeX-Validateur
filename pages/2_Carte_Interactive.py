@@ -105,7 +105,7 @@ MAP_CONFIG = {
     'livonia': {
         'label': '🗺️ Livonia ✅',
         'size': 12800,
-        'image': 'livonia_map.png',
+        'image': 'livonia_map.jpg',
         'session_key': 'zones_livonia',
         'xml_file': 'zombie_territories_livonia.xml',
         'offsets': {'x': 0, 'z': 0}
