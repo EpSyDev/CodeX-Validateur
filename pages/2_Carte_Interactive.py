@@ -120,7 +120,7 @@ def apply_map_offsets(zones, map_name):
     
     # Offsets de calibration par carte (en pixels)
     MAP_OFFSETS = {
-        'Chernarus': {'x': -26, 'z': -783},   # ✅ AJUSTÉ (remonter les points)
+        'Chernarus': {'x': 0, 'z': 0},   # ✅ AJUSTÉ (remonter les points)
         'Livonia':   {'x': 0, 'z': 0},    # ✅ VALIDÉ (Topolin)
         'Sakhal':    {'x': 0, 'z': -21}       # ✅ VALIDÉ (Caserne ouest)
     }
