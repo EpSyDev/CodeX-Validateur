@@ -1,7 +1,7 @@
 """
-corrector.py
-Applique les corrections automatiques sur le contenu.
-Uniquement les corrections sûres identifiées dans errors_db.json (correction_automatique: true).
+corrector.py - VERSION AMÉLIORÉE
+Applique les corrections automatiques sur le contenu XML et JSON
+Corrections basiques et sûres uniquement
 """
 
 import re
@@ -28,31 +28,98 @@ def get_errors_db():
 
 
 # ==============================
-# ✨ NOUVEAU : DÉTECTION BALISES NON FERMÉES
+# CORRECTIONS XML
 # ==============================
-def find_unclosed_tags(content):
+
+def fix_xml_self_closing_tags(content):
     """
-    Détecte les balises XML non fermées.
-    
-    Retourne:
-        list: [(tag_name, line_number, position), ...]
+    Corrige les balises auto-fermantes mal écrites
+    <current actual="0.45"> → <current actual="0.45" />
     """
-    # Stack pour tracker les balises ouvertes
-    open_tags = []
-    unclosed = []
+    corrected = content
+    applied = []
     
-    # Pattern pour balises
-    # Ouvrante: <tag ...> ou <tag>
-    # Fermante: </tag>
-    # Auto-fermante: <tag ... />
+    # Liste des balises DayZ connues comme auto-fermantes
+    self_closing_tags = [
+        'current', 'fog', 'overcast', 'rain', 'storm',
+        'hoarder', 'damage', 'usage', 'value', 'category',
+        'tier', 'cargo', 'item'
+    ]
     
+    for tag in self_closing_tags:
+        # Pattern : <tag ...> (sans /> et sans contenu ni </tag>)
+        pattern = rf'<{tag}(\s[^>]*)?(?<!/)>'
+        
+        # Vérifier qu'il n'y a pas de </tag> après
+        matches = list(re.finditer(pattern, corrected))
+        
+        for match in reversed(matches):  # Parcourir à l'envers pour ne pas décaler les positions
+            tag_content = match.group(0)
+            start_pos = match.start()
+            end_pos = match.end()
+            
+            # Vérifier qu'il n'y a pas de balise fermante correspondante
+            after_tag = corrected[end_pos:end_pos+100]
+            if f'</{tag}>' not in after_tag:
+                # C'est bien une balise qui devrait être auto-fermante
+                corrected_tag = tag_content[:-1] + ' />'
+                corrected = corrected[:start_pos] + corrected_tag + corrected[end_pos:]
+                applied.append(f"Ajout de /> à la balise <{tag}>")
+    
+    return corrected, applied
+
+
+def fix_xml_unclosed_comments(content):
+    """
+    Corrige les commentaires XML non fermés
+    <!-- commentaire → <!-- commentaire -->
+    """
+    corrected = content
+    applied = []
+    
+    # Compter les <!-- et les -->
+    open_count = content.count('<!--')
+    close_count = content.count('-->')
+    
+    if open_count > close_count:
+        # Il manque des fermetures
+        missing = open_count - close_count
+        corrected += '\n' + ('-->\n' * missing)
+        applied.append(f"Fermeture de {missing} commentaire(s) XML")
+    
+    return corrected, applied
+
+
+def fix_xml_unescaped_chars(content):
+    """
+    Échappe les caractères spéciaux XML
+    & → &amp; (sauf si déjà échappé)
+    """
+    corrected = content
+    applied = []
+    
+    # Échapper & qui ne sont pas déjà échappés
+    unescaped_count = len(re.findall(r'&(?!(amp|lt|gt|quot|apos);)', corrected))
+    if unescaped_count > 0:
+        corrected = re.sub(r'&(?!(amp|lt|gt|quot|apos);)', '&amp;', corrected)
+        applied.append(f"Échappement de {unescaped_count} caractère(s) &")
+    
+    return corrected, applied
+
+
+def fix_xml_unclosed_tags(content):
+    """
+    Détecte et ferme les balises XML non fermées
+    """
     lines = content.split('\n')
+    open_tags = []
+    applied = []
     
     for line_num, line in enumerate(lines, start=1):
         # Ignorer commentaires
         line_clean = re.sub(r'<!--.*?-->', '', line)
         
-        # Trouver balises auto-fermantes (on les ignore)
+        # Ignorer balises auto-fermantes
         line_clean = re.sub(r'<[^>]+/>', '', line_clean)
         
         # Trouver balises fermantes
@@ -60,66 +127,175 @@ def find_unclosed_tags(content):
         for tag in closing_tags:
             if open_tags and open_tags[-1][0] == tag:
                 open_tags.pop()
-            # Sinon c'est une balise fermante orpheline (autre erreur)
         
         # Trouver balises ouvrantes
         opening_tags = re.findall(r'<(\w+)(?:\s[^>]*)?>(?![^<]*/>)', line_clean)
         for tag in opening_tags:
             open_tags.append((tag, line_num, line))
     
-    # Ce qui reste dans open_tags = balises non fermées
-    return open_tags
+    # Ajouter les balises fermantes manquantes
+    if open_tags:
+        corrected = content
+        for tag_name, line_num, original_line in reversed(open_tags):
+            indent = len(original_line) - len(original_line.lstrip())
+            closing_tag = '\n' + (' ' * indent) + f'</{tag_name}>'
+            corrected += closing_tag
+            applied.append(f"Ajout de </{tag_name}>")
+        
+        return corrected, applied
+    
+    return content, []
+
+
+def _correct_xml(content):
+    """Applique toutes les corrections automatiques XML"""
+    corrected = content
+    all_applied = []
+    
+    # 1. Balises auto-fermantes
+    corrected, applied = fix_xml_self_closing_tags(corrected)
+    all_applied.extend(applied)
+    
+    # 2. Caractères non échappés
+    corrected, applied = fix_xml_unescaped_chars(corrected)
+    all_applied.extend(applied)
+    
+    # 3. Commentaires non fermés
+    corrected, applied = fix_xml_unclosed_comments(corrected)
+    all_applied.extend(applied)
+    
+    # 4. Balises non fermées
+    corrected, applied = fix_xml_unclosed_tags(corrected)
+    all_applied.extend(applied)
+    
+    return {
+        "corrected": corrected,
+        "applied_corrections": all_applied,
+        "has_changes": len(all_applied) > 0
+    }
 
 
 # ==============================
-# ✨ NOUVEAU : CORRECTION BALISES NON FERMÉES
+# CORRECTIONS JSON
 # ==============================
-def fix_unclosed_tags(content):
+
+def fix_json_trailing_commas(content):
     """
-    Corrige automatiquement les balises non fermées en ajoutant les balises fermantes.
-    
-    Retourne:
-        tuple: (corrected_content, list_of_fixes)
+    Supprime les virgules finales avant } ou ]
+    {"key": "value",} → {"key": "value"}
     """
-    unclosed = find_unclosed_tags(content)
+    corrected = content
+    applied = []
     
-    if not unclosed:
-        return content, []
+    if re.search(r',\s*[}\]]', corrected):
+        corrected = re.sub(r',\s*}', '}', corrected)
+        corrected = re.sub(r',\s*]', ']', corrected)
+        applied.append("Suppression des virgules finales")
     
-    lines = content.split('\n')
-    fixes = []
+    return corrected, applied
+
+
+def fix_json_single_quotes(content):
+    """
+    Convertit les guillemets simples en doubles
+    {'key': 'value'} → {"key": "value"}
+    """
+    corrected = content
+    applied = []
     
-    # Parcourir les balises non fermées (de la plus récente à la plus ancienne)
-    for tag_name, line_num, original_line in reversed(unclosed):
-        # Trouver où insérer la balise fermante
-        # On cherche la prochaine balise ouvrante du même niveau ou la fin du fichier
-        
-        insert_line = None
-        indent = len(original_line) - len(original_line.lstrip())
-        
-        # Chercher la prochaine balise de même niveau ou niveau supérieur
-        for i in range(line_num, len(lines)):
-            current_line = lines[i]
-            current_indent = len(current_line) - len(current_line.lstrip())
+    # Remplacer ' par " SEULEMENT pour les clés (pattern 'clé':)
+    if re.search(r"'[^']*'\s*:", corrected):
+        corrected = corrected.replace("'", '"')
+        applied.append("Conversion guillemets simples → doubles")
+    
+    return corrected, applied
+
+
+def fix_json_missing_quotes(content):
+    """
+    Ajoute des guillemets aux clés sans guillemets
+    {key: "value"} → {"key": "value"}
+    """
+    corrected = content
+    applied = []
+    
+    # Pattern pour détecter clés sans guillemets
+    pattern = r'(\{|,)\s*([a-zA-Z_]\w*)\s*:'
+    matches = list(re.finditer(pattern, corrected))
+    
+    if matches:
+        # Parcourir à l'envers pour ne pas décaler les positions
+        for match in reversed(matches):
+            key_name = match.group(2)
+            full_match = match.group(0)
             
-            # Si on trouve une balise ouvrante au même niveau, on insère avant
-            if current_indent <= indent and re.search(r'<\w+', current_line):
-                insert_line = i
-                break
+            # Remplacer par version avec guillemets
+            prefix = match.group(1)
+            replacement = f'{prefix} "{key_name}":'
+            
+            start = match.start()
+            end = match.end()
+            corrected = corrected[:start] + replacement + corrected[end:]
         
-        # Si pas trouvé, insérer à la fin
-        if insert_line is None:
-            insert_line = len(lines)
-        
-        # Créer la balise fermante avec la bonne indentation
-        closing_tag = ' ' * indent + f'</{tag_name}>'
-        
-        # Insérer la balise fermante
-        lines.insert(insert_line, closing_tag)
-        
-        fixes.append(f"Ajout de </{tag_name}> à la ligne {insert_line + 1}")
+        applied.append(f"Ajout de guillemets à {len(matches)} clé(s)")
     
-    return '\n'.join(lines), fixes
+    return corrected, applied
+
+
+def fix_json_unclosed_brackets(content):
+    """
+    Ferme les accolades/crochets manquants
+    {"key": "value" → {"key": "value"}
+    """
+    corrected = content
+    applied = []
+    
+    # Compter les accolades et crochets
+    open_braces = content.count('{')
+    close_braces = content.count('}')
+    open_brackets = content.count('[')
+    close_brackets = content.count(']')
+    
+    # Ajouter les fermetures manquantes
+    if open_braces > close_braces:
+        missing = open_braces - close_braces
+        corrected += '\n' + ('}' * missing)
+        applied.append(f"Fermeture de {missing} accolade(s)")
+    
+    if open_brackets > close_brackets:
+        missing = open_brackets - close_brackets
+        corrected += '\n' + (']' * missing)
+        applied.append(f"Fermeture de {missing} crochet(s)")
+    
+    return corrected, applied
+
+
+def _correct_json(content):
+    """Applique toutes les corrections automatiques JSON"""
+    corrected = content
+    all_applied = []
+    
+    # 1. Virgules finales
+    corrected, applied = fix_json_trailing_commas(corrected)
+    all_applied.extend(applied)
+    
+    # 2. Guillemets simples → doubles
+    corrected, applied = fix_json_single_quotes(corrected)
+    all_applied.extend(applied)
+    
+    # 3. Clés sans guillemets
+    corrected, applied = fix_json_missing_quotes(corrected)
+    all_applied.extend(applied)
+    
+    # 4. Accolades/crochets non fermés
+    corrected, applied = fix_json_unclosed_brackets(corrected)
+    all_applied.extend(applied)
+    
+    return {
+        "corrected": corrected,
+        "applied_corrections": all_applied,
+        "has_changes": len(all_applied) > 0
+    }
 
 
 # ==============================
@@ -135,9 +311,9 @@ def auto_correct(content, file_type):
     
     Retourne :
         {
-            "corrected": str,                    → contenu corrigé
-            "applied_corrections": [str, ...],   → liste des corrections appliquées
-            "has_changes": bool                  → vrai si au moins une correction
+            "corrected": str,
+            "applied_corrections": [str, ...],
+            "has_changes": bool
         }
     """
     if file_type == "json":
@@ -154,83 +330,32 @@ def auto_correct(content, file_type):
 
 
 # ==============================
-# CORRECTIONS JSON
-# ==============================
-def _correct_json(content):
-    """Applique les corrections automatiques JSON"""
-    corrected = content
-    applied = []
-    
-    # 1. Virgules finales avant } ou ]
-    if re.search(r',\s*[}\]]', corrected):
-        corrected = re.sub(r',\s*}', '}', corrected)
-        corrected = re.sub(r',\s*]', ']', corrected)
-        applied.append("Suppression des virgules finales")
-    
-    # 2. Guillemets simples → doubles
-    # ATTENTION : on ne fait ça QUE si on détecte des clés avec guillemets simples
-    # Pas si c'est du texte à l'intérieur d'une valeur
-    if re.search(r"'[^']*'\s*:", corrected):  # Pattern 'clé':
-        corrected = corrected.replace("'", '"')
-        applied.append("Conversion guillemets simples → doubles")
-    
-    has_changes = len(applied) > 0
-    
-    return {
-        "corrected": corrected,
-        "applied_corrections": applied,
-        "has_changes": has_changes
-    }
-
-
-# ==============================
-# CORRECTIONS XML
-# ==============================
-def _correct_xml(content):
-    """Applique les corrections automatiques XML"""
-    corrected = content
-    applied = []
-    
-    # 1. Caractères spéciaux non échappés
-    # & → &amp; (sauf si déjà échappé)
-    unescaped_count = len(re.findall(r'&(?!(amp|lt|gt|quot|apos);)', corrected))
-    if unescaped_count > 0:
-        corrected = re.sub(r'&(?!(amp|lt|gt|quot|apos);)', '&amp;', corrected)
-        applied.append(f"Échappement de {unescaped_count} caractère(s) & → &amp;")
-    
-    # ✨ 2. NOUVEAU : Balises non fermées
-    corrected_with_tags, tag_fixes = fix_unclosed_tags(corrected)
-    if tag_fixes:
-        corrected = corrected_with_tags
-        applied.extend(tag_fixes)
-    
-    has_changes = len(applied) > 0
-    
-    return {
-        "corrected": corrected,
-        "applied_corrections": applied,
-        "has_changes": has_changes
-    }
-
-
-# ==============================
 # VÉRIFICATION DE FAISABILITÉ
 # ==============================
 def can_auto_correct(error_matched):
     """
     Vérifie si une erreur matchée peut être corrigée automatiquement.
     
-    Paramètre :
-        error_matched → entrée de errors_db (dict) ou None
-    
     Retourne :
-        bool → True si correction_automatique est à True OU si c'est une balise non fermée
+        bool → True si correction possible
     """
     if not error_matched:
         return False
     
-    # ✨ NOUVEAU : Les balises non fermées sont maintenant auto-corrigeables
-    if error_matched.get("id") in ["XML_002", "XML_006"]:
+    # Liste étendue des erreurs auto-corrigeables
+    auto_correctable_ids = [
+        "XML_001",  # Balise auto-fermante
+        "XML_002",  # Balise non fermée
+        "XML_004",  # Commentaire non fermé
+        "XML_005",  # Caractères non échappés
+        "XML_006",  # Balises mismatch
+        "JSON_001", # Virgule finale
+        "JSON_002", # Guillemets simples
+        "JSON_003", # Clé sans guillemets
+        "JSON_004"  # Accolade non fermée
+    ]
+    
+    if error_matched.get("id") in auto_correctable_ids:
         return True
     
     return error_matched.get("correction_automatique", False)
@@ -241,25 +366,24 @@ def can_auto_correct(error_matched):
 # ==============================
 def preview_corrections(content, file_type):
     """
-    Prévisualise les corrections qui seront appliquées SANS modifier le contenu.
-    Utile pour afficher à l'utilisateur ce qui va changer avant de valider.
+    Prévisualise les corrections qui seront appliquées.
     
     Retourne :
         {
-            "will_apply": [str, ...],   → liste des corrections qui seront faites
-            "safe": bool                → True si toutes les corrections sont sûres
+            "will_apply": [str, ...],
+            "safe": bool
         }
     """
     result = auto_correct(content, file_type)
     
     return {
         "will_apply": result["applied_corrections"],
-        "safe": True  # Toutes nos corrections sont sûres par défaut
+        "safe": True
     }
 
 
 # ==============================
-# CORRECTION GUIDÉE (futur)
+# SUGGESTIONS MANUELLES
 # ==============================
 def suggest_manual_fixes(content, file_type, error_matched):
     """
@@ -268,7 +392,7 @@ def suggest_manual_fixes(content, file_type, error_matched):
     Retourne :
         {
             "can_auto": bool,
-            "manual_steps": [str, ...]   → étapes à faire manuellement
+            "manual_steps": [str, ...]
         }
     """
     if can_auto_correct(error_matched):
@@ -277,31 +401,19 @@ def suggest_manual_fixes(content, file_type, error_matched):
             "manual_steps": []
         }
     
-    # Suggestions manuelles selon le type d'erreur
+    # Suggestions manuelles
     manual_steps = []
     
     if error_matched:
         error_id = error_matched.get("id", "")
         
-        if "XML_001" in error_id:  # Balise auto-fermante
-            manual_steps.append("Ajoute /> à la fin de la balise")
-            manual_steps.append("Exemple : <current actual=\"0.45\" />")
-        
-        elif "XML_003" in error_id:  # Attribut mal formé
+        if "XML_003" in error_id:  # Attribut mal formé
             manual_steps.append("Vérifie que chaque attribut a une valeur")
             manual_steps.append("Format : nom=\"valeur\"")
         
-        elif "XML_004" in error_id:  # Commentaire non fermé
-            manual_steps.append("Trouve le commentaire <!-- ouvert")
-            manual_steps.append("Ajoute --> pour le fermer")
-        
-        elif "JSON_003" in error_id:  # Clé sans guillemets
-            manual_steps.append("Entoure chaque clé de guillemets doubles")
-            manual_steps.append('Exemple : "damage" au lieu de damage')
-        
-        elif "JSON_004" in error_id:  # Parenthèse non fermée
-            manual_steps.append("Vérifie que chaque { a son }")
-            manual_steps.append("Vérifie que chaque [ a son ]")
+        elif "XML_007" in error_id:  # Balise inconnue
+            manual_steps.append("Vérifie le nom de la balise")
+            manual_steps.append("Consulte la documentation DayZ")
     
     return {
         "can_auto": False,
