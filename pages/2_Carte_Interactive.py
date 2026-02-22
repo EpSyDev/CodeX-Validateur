@@ -319,7 +319,7 @@ if 'current_map' not in st.session_state:
 # HEADER
 # ==============================
 try:
-    st.image("images/codex3-V2.png", use_column_width=True)
+    st.image("assets/images/codex_header1.png", use_column_width=True)
 except:
     pass
 
@@ -394,7 +394,7 @@ with tab1:
     
     # Carte
     st.markdown("### 🗺️ Carte Chernarus")
-    img_path = Path(__file__).parent.parent / "images" / "chernarus_map.webp"
+    img_path = Path(__file__).parent.parent / "images" / "chernarus_map.jpg"
     fig = create_map(filtered_zones, "Chernarus", 15360, img_path)
     
     if fig:
@@ -467,7 +467,7 @@ with tab2:
     
     # Carte
     st.markdown("### 🗺️ Carte Livonia")
-    img_path = Path(__file__).parent.parent / "images" / "livonia_map.jpg"
+    img_path = Path(__file__).parent.parent / "images" / "livonia_map.png"
     fig = create_map(filtered_zones, "Livonia", 12800, img_path)
     
     if fig:
