@@ -145,6 +145,16 @@ header { visibility: hidden; }
     border-color: #00D4FF;
     color: #00D4FF !important;
 }
+.header-container {
+    width: 100%;
+    margin: 0 0 40px 0;
+    padding: 0;
+}
+.header-container img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
 </style>
 """, unsafe_allow_html=True)
 
