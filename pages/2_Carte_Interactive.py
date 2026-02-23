@@ -29,49 +29,121 @@ st.set_page_config(
 # ==============================
 st.markdown("""
 <style>
-* { font-family: Inter, sans-serif; }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
 
-.zone-card {
-    background: #1a1a2e;
-    color: #e0e0e0;
-    padding: 15px 20px;
-    border-radius: 10px;
-    border-left: 4px solid #00D4FF;
-    margin: 10px 0;
+* { font-family: 'Inter', sans-serif; }
+.stApp { background: #000000; }
+#MainMenu { visibility: hidden; }
+footer { visibility: hidden; }
+header { visibility: hidden; }
+
+.content-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 30px 80px 30px;
 }
-.zone-card h4 { color: #00D4FF; margin: 0 0 8px 0; }
-.zone-card p  { margin: 4px 0; font-size: 0.9em; }
+
+.page-title {
+    text-align: center;
+    font-size: 38px;
+    font-weight: 800;
+    color: #FFFFFF;
+    margin-bottom: 40px;
+    text-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+}
 
 .stats-box {
-    background: linear-gradient(135deg, #0f3460, #16213e);
+    background: linear-gradient(135deg, rgba(0, 25, 50, 0.65) 0%, rgba(0, 15, 30, 0.75) 100%);
+    border: 1px solid rgba(0, 212, 255, 0.25);
     color: white;
     padding: 16px;
-    border-radius: 12px;
+    border-radius: 16px;
     text-align: center;
-    border: 1px solid #00D4FF33;
     margin: 6px 0;
 }
 .stats-box h2 { color: #00D4FF; margin: 0; font-size: 2em; }
-.stats-box p  { margin: 4px 0 0 0; font-size: 0.85em; color: #aaa; }
+.stats-box p  { margin: 4px 0 0 0; font-size: 0.85em; color: rgba(255,255,255,0.6); }
+
+.zone-card {
+    background: linear-gradient(135deg, rgba(0, 25, 50, 0.65) 0%, rgba(0, 15, 30, 0.75) 100%);
+    border: 1px solid rgba(0, 212, 255, 0.25);
+    border-left: 4px solid #00D4FF;
+    color: rgba(255,255,255,0.85);
+    padding: 15px 20px;
+    border-radius: 16px;
+    margin: 10px 0;
+}
+.zone-card h4 { color: #00D4FF; margin: 0 0 8px 0; font-size: 16px; font-weight: 700; }
+.zone-card p  { margin: 4px 0; font-size: 0.9em; }
 
 .calibration-note {
-    background: #1a2a1a;
+    background: linear-gradient(135deg, rgba(0, 25, 50, 0.65) 0%, rgba(0, 15, 30, 0.75) 100%);
+    border: 1px solid rgba(0, 212, 255, 0.25);
     border-left: 4px solid #00D4FF;
     padding: 12px 16px;
     margin: 10px 0;
-    border-radius: 4px;
-    color: #ccc;
+    border-radius: 8px;
+    color: rgba(255,255,255,0.8);
     font-size: 0.9em;
 }
 
 .tip-box {
-    background: #0f2027;
-    border-left: 3px solid #ffc107;
+    background: rgba(0, 25, 50, 0.55);
+    border-left: 3px solid #fbbf24;
     padding: 10px 14px;
     border-radius: 4px;
     font-size: 0.85em;
-    color: #ccc;
+    color: rgba(255,255,255,0.8);
     margin: 8px 0;
+}
+
+.stButton > button {
+    background: linear-gradient(135deg, #00D4FF 0%, #0EA5E9 100%);
+    color: #000000;
+    border: none;
+    border-radius: 14px;
+    padding: 16px 32px;
+    font-size: 15px;
+    font-weight: 700;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 18px rgba(0, 212, 255, 0.3);
+}
+.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+}
+
+/* Tabs Streamlit */
+.stTabs [data-baseweb="tab-list"] {
+    background: rgba(0, 15, 30, 0.8);
+    border-radius: 12px;
+    padding: 4px;
+    border: 1px solid rgba(0, 212, 255, 0.2);
+}
+.stTabs [data-baseweb="tab"] {
+    color: rgba(255,255,255,0.6);
+    font-weight: 600;
+    border-radius: 8px;
+}
+.stTabs [aria-selected="true"] {
+    background: rgba(0, 212, 255, 0.15) !important;
+    color: #00D4FF !important;
+}
+
+/* Radio buttons */
+.stRadio > div { gap: 12px; }
+.stRadio label {
+    background: rgba(0, 25, 50, 0.5);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 10px;
+    padding: 8px 16px;
+    color: rgba(255,255,255,0.8) !important;
+    transition: all 0.2s;
+}
+.stRadio label:has(input:checked) {
+    background: rgba(0, 212, 255, 0.15);
+    border-color: #00D4FF;
+    color: #00D4FF !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -86,8 +158,9 @@ MAP_CONFIG = {
         'image':   'chernarus_map.jpg',
         'offsets': {'x': 0, 'z': 0},
         'files': {
-            'zombies': 'zombie_territories_chernarus.xml',
-            'events':  'cfgeventspawns_chernarus.xml',
+            'zombies':  'zombie_territories_chernarus.xml',
+            'events':   'cfgeventspawns_chernarus.xml',
+            'spawns':   'cfgplayerspawnpoints_chernarus.xml',
         }
     },
     'livonia': {
@@ -96,8 +169,9 @@ MAP_CONFIG = {
         'image':   'livonia_map.jpg',
         'offsets': {'x': 0, 'z': 0},
         'files': {
-            'zombies': 'zombie_territories_livonia.xml',
-            'events':  'cfgeventspawns_livonia.xml',
+            'zombies':  'zombie_territories_livonia.xml',
+            'events':   'cfgeventspawns_livonia.xml',
+            'spawns':   'cfgplayerspawnpoints_livonia.xml',
         }
     },
     'sakhal': {
@@ -106,8 +180,9 @@ MAP_CONFIG = {
         'image':   'sakhal_map.webp',
         'offsets': {'x': 0, 'z': -21},
         'files': {
-            'zombies': 'zombie_territories_sakhal.xml',
-            'events':  'cfgeventspawns_sakhal.xml',
+            'zombies':  'zombie_territories_sakhal.xml',
+            'events':   'cfgeventspawns_sakhal.xml',
+            'spawns':   'cfgplayerspawnpoints_sakhal.xml',
         }
     },
 }
@@ -158,12 +233,21 @@ EVENT_COLORS = {
     '❓ Autre':             '#808080',
 }
 
+SPAWN_COLORS = {
+    'fresh':  '#00FF7F',
+    'hop':    '#FFA500',
+    'travel': '#6699CC',
+}
+
 def get_point_color(name, source='zombies'):
     if source == 'zombies':
         for key, color in ZOMBIE_COLORS.items():
             if key in name:
                 return color
         return '#808080'
+    elif source == 'spawns':
+        spawn_type = name.split('|')[0] if '|' in name else 'fresh'
+        return SPAWN_COLORS.get(spawn_type, '#808080')
     else:
         cat = get_event_category(name)
         return EVENT_COLORS.get(cat, '#808080')
@@ -341,12 +425,94 @@ def apply_offsets(points, map_key):
     return result
 
 
+def parse_player_spawns(xml_content):
+    """
+    Parse cfgplayerspawnpoints.xml.
+    3 types : fresh (nouveau spawn), hop (respawn rapide), travel (usage avancé).
+    Nom du point = 'type|NomGroupe' pour portage couleur + filtre.
+    """
+    root = ET.fromstring(xml_content)
+    points = []
+
+    SPAWN_TYPES = {
+        'fresh':  ('fresh',  True),   # (type, actif par défaut)
+        'hop':    ('hop',    True),
+        'travel': ('travel', False),  # désactivé par défaut — usage avancé
+    }
+
+    for spawn_type, (type_key, default_active) in SPAWN_TYPES.items():
+        section = root.find(spawn_type)
+        if section is None:
+            continue
+        bubbles = section.find('generator_posbubbles')
+        if bubbles is None:
+            continue
+        for group in bubbles.findall('group'):
+            group_name = group.get('name', 'Unknown')
+            for i, pos in enumerate(group.findall('pos')):
+                try:
+                    x = float(pos.get('x', 0))
+                    z = float(pos.get('z', 0))
+                except ValueError:
+                    continue
+                points.append({
+                    'source':     'spawns',
+                    'name':       f"{type_key}|{group_name}",
+                    'spawn_type': type_key,
+                    'group':      group_name,
+                    'x':          x,
+                    'z':          z,
+                    'pos_index':  i,
+                    'active':     default_active,
+                    # Pas de smin/smax pour les spawns joueurs
+                })
+    return points
+
+
+def generate_player_spawns_xml(points):
+    """
+    Reconstruit cfgplayerspawnpoints.xml depuis la liste de points.
+    Conserve la structure originale avec spawn_params et generator_params
+    en les relisant depuis le fichier vanilla (lecture seule).
+    Les positions désactivées sont simplement omises du fichier.
+    """
+    # Regrouper par type puis par groupe
+    from collections import defaultdict
+    by_type = defaultdict(lambda: defaultdict(list))
+    for p in points:
+        if p['active']:
+            by_type[p['spawn_type']][p['group']].append(p)
+
+    lines = ['<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>', '<playerspawnpoints>']
+
+    TYPE_ORDER = ['fresh', 'hop', 'travel']
+    for spawn_type in TYPE_ORDER:
+        groups = by_type.get(spawn_type, {})
+        lines.append(f'    <{spawn_type}>')
+        lines.append(f'        <generator_posbubbles>')
+        for group_name, pts in sorted(groups.items()):
+            lines.append(f'            <group name="{group_name}">')
+            for p in sorted(pts, key=lambda x: x['pos_index']):
+                lines.append(f'                <pos x="{p["x"]}" z="{p["z"]}" />')
+            lines.append(f'            </group>')
+        lines.append(f'        </generator_posbubbles>')
+        lines.append(f'    </{spawn_type}>')
+
+    lines.append('</playerspawnpoints>')
+    return '\n'.join(lines)
+
+
 def load_from_file(map_key, data_type):
     filename = MAP_CONFIG[map_key]['files'][data_type]
     path = Path(__file__).parent.parent / "data" / filename
     with open(path, 'r', encoding='utf-8') as f:
         content = f.read()
-    return parse_zombie_territories(content) if data_type == 'zombies' else parse_event_spawns(content)
+    if data_type == 'zombies':
+        return parse_zombie_territories(content)
+    elif data_type == 'spawns':
+        return parse_player_spawns(content)
+    else:
+        return parse_event_spawns(content)
 
 
 def sk(map_key, data_type):
@@ -406,6 +572,15 @@ def create_map(points, map_key, selected_names, show_active_only):
                     f"Radius: {p['r']:.0f}m<br>"
                     f"Spawn fixe: {p['smin']}–{p['smax']}<br>"
                     f"Spawn dyn: {p['dmin']}–{p['dmax']}<br>{status}"
+                )
+            elif p.get('source') == 'spawns':
+                spawn_type = p.get('spawn_type', 'fresh')
+                warning = '<br>⚠️ <i>Travel — usage avancé</i>' if spawn_type == 'travel' else ''
+                hover_texts.append(
+                    f"<b>{p['group']}</b><br>"
+                    f"Type : {spawn_type.upper()}<br>"
+                    f"Position: ({p['x']:.0f}, {p['z']:.0f})"
+                    f"{warning}<br>{status}"
                 )
             else:
                 cat = p.get('category', '❓')
@@ -467,7 +642,7 @@ def create_map(points, map_key, selected_names, show_active_only):
 # SESSION STATE INIT
 # ==============================
 for mk in MAP_CONFIG:
-    for dt in ('zombies', 'events'):
+    for dt in ('zombies', 'events', 'spawns'):
         key = sk(mk, dt)
         if key not in st.session_state:
             try:
@@ -482,15 +657,18 @@ if 'sel_source' not in st.session_state: st.session_state.sel_source = None
 # ==============================
 # HEADER
 # ==============================
+# Header image
 try:
+    st.markdown('<div class="header-container">', unsafe_allow_html=True)
     st.image("assets/images/codex_header1.png", use_column_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 except Exception:
     pass
 
-st.title("🗺️ Carte Interactive — DayZ")
-st.subheader("Éditeur visuel multi-événements")
+st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
+st.markdown('<div class="page-title">🗺️ Carte Interactive — DayZ</div>', unsafe_allow_html=True)
 
-if st.button("⬅️ Retour à l'accueil"):
+if st.button("⬅️ Retour à l\'accueil"):
     st.switch_page("app.py")
 
 st.markdown("""
@@ -517,12 +695,18 @@ for tab_obj, map_key in zip(tabs, MAP_CONFIG):
         st.markdown("### 🎯 Type d'événement")
         event_mode = st.radio(
             "Afficher sur la carte :",
-            options=['🧟 Zombies', '📍 Events (véhicules, crashes, gaz...)'],
+            options=['🧟 Zombies', '📍 Events (véhicules, crashes, gaz...)', '👤 Spawns joueurs'],
             horizontal=True,
             key=f"mode_{map_key}"
         )
-        is_zombie_mode = event_mode.startswith('🧟')
-        data_type = 'zombies' if is_zombie_mode else 'events'
+        is_zombie_mode  = event_mode.startswith('🧟')
+        is_spawns_mode  = event_mode.startswith('👤')
+        if is_zombie_mode:
+            data_type = 'zombies'
+        elif is_spawns_mode:
+            data_type = 'spawns'
+        else:
+            data_type = 'events'
         data_key = sk(map_key, data_type)
         points = st.session_state[data_key]
 
@@ -549,8 +733,23 @@ for tab_obj, map_key in zip(tabs, MAP_CONFIG):
                     names_all, default=names_all,
                     key=f"filter_{map_key}_{data_type}"
                 )
+            elif is_spawns_mode:
+                # Filtre par type de spawn
+                spawn_types_avail = sorted(set(p.get('spawn_type', 'fresh') for p in points))
+                selected_spawn_types = st.multiselect(
+                    "🔍 Filtrer par type de spawn",
+                    spawn_types_avail,
+                    default=[t for t in spawn_types_avail if t != 'travel'],  # travel masqué par défaut
+                    key=f"filter_spawn_{map_key}"
+                )
+                if 'travel' in selected_spawn_types:
+                    st.warning("⚠️ **Travel** — zones de spawn avancées. À modifier uniquement si vous savez ce que vous faites.")
+                selected_names = sorted(set(
+                    p['name'] for p in points
+                    if p.get('spawn_type', 'fresh') in selected_spawn_types
+                ))
             else:
-                # Filtre par catégorie
+                # Filtre par catégorie events
                 cats_available = sorted(set(p.get('category', '❓ Autre') for p in points))
                 selected_cats = st.multiselect(
                     "🔍 Filtrer par catégorie",
@@ -620,8 +819,13 @@ for tab_obj, map_key in zip(tabs, MAP_CONFIG):
         st.markdown("---")
 
         # --- Export ---
-        xml_out = generate_zombie_xml(points) if is_zombie_mode else generate_event_spawns_xml(points)
-        fname   = MAP_CONFIG[map_key]['files'][data_type]
+        if is_zombie_mode:
+            xml_out = generate_zombie_xml(points)
+        elif is_spawns_mode:
+            xml_out = generate_player_spawns_xml(points)
+        else:
+            xml_out = generate_event_spawns_xml(points)
+        fname = MAP_CONFIG[map_key]['files'][data_type]
 
         st.download_button(
             label=f"📥 Exporter {fname}",
@@ -661,6 +865,13 @@ if (st.session_state.sel_idx is not None
                 details = (
                     f"<p>📍 Position : ({point['x']:.1f}, {point['z']:.1f}) &nbsp;|&nbsp; Radius : {point['r']:.0f}m</p>"
                     f"<p>Spawn fixe : {point['smin']}–{point['smax']} &nbsp;|&nbsp; Spawn dyn : {point['dmin']}–{point['dmax']}</p>"
+                )
+            elif data_type == 'spawns':
+                spawn_type = point.get('spawn_type', 'fresh')
+                travel_warn = ' &nbsp;⚠️ <i>Usage avancé</i>' if spawn_type == 'travel' else ''
+                details = (
+                    f"<p>📍 Position : ({point['x']:.1f}, {point['z']:.1f})</p>"
+                    f"<p>Type : <b>{spawn_type.upper()}</b>{travel_warn} &nbsp;|&nbsp; Groupe : {point.get('group','?')}</p>"
                 )
             else:
                 cat = point.get('category', '❓')
@@ -714,8 +925,17 @@ if (st.session_state.sel_idx is not None
                 if st.button("✖️ Fermer", use_container_width=True, key=f"close_{map_key}_{zone_idx}"):
                     st.session_state.sel_idx = None
                     st.rerun()
+        elif data_type == 'spawns':
+            spawn_type = point.get('spawn_type', 'fresh')
+            if spawn_type == 'travel':
+                st.warning("⚠️ **Point Travel** — zone de spawn avancée. Si désactivé, ce point sera exclu de l\'export.")
+            else:
+                st.markdown('<div class="tip-box">💡 Active/désactive ce point de spawn. Les points désactivés sont exclus de l\'export XML.</div>', unsafe_allow_html=True)
+            if st.button("✖️ Fermer", use_container_width=True, key=f"close_sp_{map_key}_{zone_idx}"):
+                st.session_state.sel_idx = None
+                st.rerun()
         else:
-            st.markdown('<div class="tip-box">💡 En mode Events, tu peux activer/désactiver les positions. L\'édition des paramètres de spawn sera disponible dans une prochaine version.</div>', unsafe_allow_html=True)
+            st.markdown('<div class="tip-box">💡 En mode Events, tu peux activer/désactiver les positions.</div>', unsafe_allow_html=True)
             if st.button("✖️ Fermer", use_container_width=True, key=f"close_ev_{map_key}_{zone_idx}"):
                 st.session_state.sel_idx = None
                 st.rerun()
