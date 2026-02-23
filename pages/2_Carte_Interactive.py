@@ -20,7 +20,7 @@ from collections import defaultdict
 # ==============================
 st.set_page_config(
     page_title="Codex - Carte Interactive",
-    page_icon="🗺️",
+    page_icon="assets/images/favicon.png",
     layout="wide"
 )
 
@@ -660,7 +660,7 @@ if 'sel_source' not in st.session_state: st.session_state.sel_source = None
 # Header image
 try:
     st.markdown('<div class="header-container">', unsafe_allow_html=True)
-    st.image("assets/images/codex_header1.png", use_column_width=True)
+    st.image("assets/images/codex_header.png", use_column_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 except Exception:
     pass
