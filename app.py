@@ -275,11 +275,11 @@ with r1:
     st.markdown("""
     <div class="roadmap-card">
         <div class="roadmap-title">✅ Disponible</div>
-        <div class="roadmap-item done">13 Validateurs complets</div>
+        <div class="roadmap-item done">Validateur complet</div>
         <div class="roadmap-item done">Correction automatique</div>
         <div class="roadmap-item done">Validation sémantique</div>
         <div class="roadmap-item done">Documentation complète</div>
-        <div class="roadmap-item done">Carte Livonia</div>
+        <div class="roadmap-item done">Carte Chernarus / Livonia / Sakhal</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -287,8 +287,6 @@ with r2:
     st.markdown("""
     <div class="roadmap-card">
         <div class="roadmap-title">🚧 En cours</div>
-        <div class="roadmap-item wip">Calibration Chernarus</div>
-        <div class="roadmap-item wip">Calibration Sakhal</div>
         <div class="roadmap-item wip">Éditeur types.xml</div>
         <div class="roadmap-item wip">Templates prêts</div>
         <div class="roadmap-item wip">Chatbot IA</div>
