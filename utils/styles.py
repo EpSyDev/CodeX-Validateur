@@ -255,6 +255,24 @@ pre *, code * {
     margin: 0;
 }
 
+/* ── BLOC FICHIER FORMATÉ VALIDATEUR ── */
+.file-output-box {
+    max-height: 400px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+/* ── ONGLET INFOS VALIDATEUR ── */
+[data-testid="stInfo"],
+[data-testid="stInfo"] p,
+[data-testid="stInfo"] span,
+div.stAlert p {
+    color: #000000 !important;
+}
+
 /* ── BOUTONS ── */
 .stButton > button {
     background: linear-gradient(135deg, #00D4FF 0%, #0EA5E9 100%);
