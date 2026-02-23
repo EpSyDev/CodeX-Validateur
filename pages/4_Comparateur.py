@@ -2,6 +2,7 @@ import streamlit as st
 import xml.etree.ElementTree as ET
 import pandas as pd
 import io
+import sys
 from pathlib import Path
 
 # ─────────────────────────────────────────────
@@ -9,31 +10,23 @@ from pathlib import Path
 # ─────────────────────────────────────────────
 st.set_page_config(
     page_title="CodeX — Comparateur",
-    page_icon="🔍",
+    page_icon="images/favicon.png",
     layout="wide",
 )
 
 # ─────────────────────────────────────────────
-#  STYLE
+#  STYLE UNIFIÉ + HEADER
+# ─────────────────────────────────────────────
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from utils.styles import apply_styles, apply_header
+apply_styles(st)
+apply_header(st)
+
+# ─────────────────────────────────────────────
+#  STYLE SPÉCIFIQUE COMPARATEUR
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
-    .main { background-color: #0e1117; }
-    .stApp { background-color: #0e1117; }
-
-    .codex-title {
-        font-size: 2rem;
-        font-weight: 800;
-        color: #00D4FF;
-        letter-spacing: 2px;
-        margin-bottom: 0;
-    }
-    .codex-sub {
-        color: #8892a4;
-        font-size: 0.95rem;
-        margin-bottom: 2rem;
-    }
-
     /* Metric cards */
     .metric-row { display: flex; gap: 1rem; margin: 1.5rem 0; }
     .metric-card {
@@ -44,9 +37,9 @@ st.markdown("""
         border-left: 4px solid;
         text-align: center;
     }
-    .card-added   { border-color: #00C853; }
-    .card-removed { border-color: #FF3D00; }
-    .card-modified{ border-color: #FFD600; }
+    .card-added    { border-color: #00C853; }
+    .card-removed  { border-color: #FF3D00; }
+    .card-modified { border-color: #FFD600; }
     .card-identical{ border-color: #455A64; }
     .metric-number { font-size: 2.2rem; font-weight: 800; margin: 0; }
     .metric-label  { font-size: 0.8rem; color: #8892a4; text-transform: uppercase; letter-spacing: 1px; }
@@ -54,22 +47,6 @@ st.markdown("""
     .color-removed  { color: #FF3D00; }
     .color-modified { color: #FFD600; }
     .color-identical{ color: #546E7A; }
-
-    /* Tags dans les tableaux */
-    .tag-added    { background:#00C85322; color:#00C853; padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:600; }
-    .tag-removed  { background:#FF3D0022; color:#FF3D00; padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:600; }
-    .tag-modified { background:#FFD60022; color:#FFD600; padding:2px 8px; border-radius:4px; font-size:0.8rem; font-weight:600; }
-
-    /* Section headers */
-    .section-header {
-        background: #1a1f2e;
-        border-radius: 8px;
-        padding: 0.8rem 1.2rem;
-        margin: 1rem 0 0.5rem 0;
-        border-left: 3px solid #00D4FF;
-        font-weight: 700;
-        color: #e0e0e0;
-    }
 
     div[data-testid="stFileUploader"] {
         background: #1a1f2e;
@@ -83,7 +60,7 @@ st.markdown("""
 # ─────────────────────────────────────────────
 #  CONSTANTES — chemins vanilla embarqués
 # ─────────────────────────────────────────────
-BASE_DIR = Path(__file__).parent
+BASE_DIR = Path(__file__).parent.parent
 VANILLA_PATHS = {
     "Chernarus": BASE_DIR / "data" / "vanilla" / "chernarus" / "types.xml",
     "Livonia":   BASE_DIR / "data" / "vanilla" / "livonia"   / "types.xml",
@@ -234,12 +211,6 @@ def build_excel(result: dict, map_name: str) -> bytes:
 
     return output.getvalue()
 
-
-# ─────────────────────────────────────────────
-#  UI — EN-TÊTE
-# ─────────────────────────────────────────────
-st.markdown('<p class="codex-title">🔍 CODEX — Comparateur</p>', unsafe_allow_html=True)
-st.markdown('<p class="codex-sub">Analyse les différences entre ton types.xml custom et le fichier vanilla officiel</p>', unsafe_allow_html=True)
 
 st.divider()
 
