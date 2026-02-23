@@ -14,6 +14,12 @@ GLOBAL_CSS = """
 footer    { visibility: hidden; }
 header    { visibility: hidden; }
 
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: rgba(0, 15, 30, 0.8); }
+::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.4); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0, 212, 255, 0.7); }
+
 /* ── TEXTES FORCÉS EN BLANC (fix Opera/Edge mode sombre) ── */
 p, li, span, label,
 .stMarkdown,
