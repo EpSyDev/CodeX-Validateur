@@ -266,6 +266,25 @@ textarea::placeholder { color: rgba(255,255,255,0.4) !important; }
     color: white !important;
 }
 
+/* ── FILE UPLOADER ── */
+[data-testid="stFileUploader"] {
+    background: rgba(0, 25, 50, 0.6) !important;
+    border: 1px solid rgba(0, 212, 255, 0.3) !important;
+    border-radius: 12px !important;
+}
+[data-testid="stFileUploader"] section {
+    background: transparent !important;
+    border: none !important;
+}
+[data-testid="stFileUploader"] label,
+[data-testid="stFileUploader"] span,
+[data-testid="stFileUploader"] p {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+[data-testid="stFileDropzoneInstructions"] {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
 /* ── SELECTBOX / MULTISELECT ── */
 .stSelectbox > div > div,
 .stMultiSelect > div > div {
