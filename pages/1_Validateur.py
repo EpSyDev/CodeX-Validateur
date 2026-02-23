@@ -33,6 +33,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from utils.styles import apply_styles, apply_header
 
+if st.button("⬅️ Retour à l'accueil"):
+    st.switch_page("app.py")
+
 apply_styles(st)
 apply_header(st)
 
