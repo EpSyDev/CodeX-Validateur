@@ -27,32 +27,64 @@ apply_header(st)
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
-    /* Metric cards */
+    /* ── METRIC CARDS ── */
     .metric-row { display: flex; gap: 1rem; margin: 1.5rem 0; }
     .metric-card {
         flex: 1;
-        background: #1a1f2e;
-        border-radius: 10px;
+        background: rgba(0, 25, 50, 0.65);
+        border: 1px solid rgba(0, 212, 255, 0.15);
+        border-radius: 12px;
         padding: 1.2rem 1.5rem;
         border-left: 4px solid;
         text-align: center;
     }
-    .card-added    { border-color: #00C853; }
-    .card-removed  { border-color: #FF3D00; }
-    .card-modified { border-color: #FFD600; }
-    .card-identical{ border-color: #455A64; }
-    .metric-number { font-size: 2.2rem; font-weight: 800; margin: 0; }
-    .metric-label  { font-size: 0.8rem; color: #8892a4; text-transform: uppercase; letter-spacing: 1px; }
-    .color-added    { color: #00C853; }
-    .color-removed  { color: #FF3D00; }
+    .card-added    { border-left-color: #00FF88; }
+    .card-removed  { border-left-color: #FF4D4D; }
+    .card-modified { border-left-color: #FFD600; }
+    .card-identical{ border-left-color: #00D4FF; }
+    .metric-number { font-size: 2.4rem; font-weight: 900; margin: 0 0 6px 0; text-shadow: 0 0 12px currentColor; }
+    .metric-label  { font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.75) !important; text-transform: uppercase; letter-spacing: 2px; }
+    .color-added    { color: #00FF88; }
+    .color-removed  { color: #FF4D4D; }
     .color-modified { color: #FFD600; }
-    .color-identical{ color: #546E7A; }
+    .color-identical{ color: #00D4FF; }
 
-    div[data-testid="stFileUploader"] {
-        background: #1a1f2e;
-        border: 2px dashed #00D4FF44;
-        border-radius: 10px;
-        padding: 1rem;
+    /* ── FILE UPLOADER — override global pour lisibilité ── */
+    [data-testid="stFileUploader"] {
+        background: rgba(0, 212, 255, 0.06) !important;
+        border: 2px dashed rgba(0, 212, 255, 0.4) !important;
+        border-radius: 12px !important;
+    }
+    [data-testid="stFileUploader"] section {
+        background: transparent !important;
+        border: none !important;
+    }
+    [data-testid="stFileDropzoneInstructions"],
+    [data-testid="stFileDropzoneInstructions"] span,
+    [data-testid="stFileDropzoneInstructions"] small,
+    [data-testid="stFileUploader"] span,
+    [data-testid="stFileUploader"] p {
+        color: rgba(255, 255, 255, 0.75) !important;
+    }
+    /* Bouton Browse — visible sur fond sombre */
+    [data-testid="stFileUploader"] button,
+    [data-testid="stBaseButton-secondary"] {
+        background: rgba(0, 212, 255, 0.15) !important;
+        border: 1px solid rgba(0, 212, 255, 0.5) !important;
+        color: #00D4FF !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+    }
+    [data-testid="stFileUploader"] button:hover {
+        background: rgba(0, 212, 255, 0.25) !important;
+    }
+
+    /* ── SELECTBOX ── */
+    [data-testid="stSelectbox"] > div > div {
+        background: rgba(0, 25, 50, 0.7) !important;
+        border: 1px solid rgba(0, 212, 255, 0.35) !important;
+        color: white !important;
+        border-radius: 10px !important;
     }
 </style>
 """, unsafe_allow_html=True)
