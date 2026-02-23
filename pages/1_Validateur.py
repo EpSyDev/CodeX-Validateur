@@ -19,7 +19,7 @@ from modules.validator import validate
 
 st.set_page_config(
     page_title="Codex - Validateur",
-    page_icon="📝",
+    page_icon="images/favicon.png",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
