@@ -544,11 +544,6 @@ if 'sel_source' not in st.session_state: st.session_state.sel_source = None
 # ==============================
 # HEADER IMAGE
 # ==============================
-st.markdown("""
-<div class="header-container">
-    <img src="https://raw.githubusercontent.com/EpSyDev/codex-validateur/main/assets/images/codex_header.png" alt="CODEX">
-</div>
-""", unsafe_allow_html=True)
 
 st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
 st.markdown('<div class="page-title">🗺️ Carte Interactive — DayZ</div>', unsafe_allow_html=True)
