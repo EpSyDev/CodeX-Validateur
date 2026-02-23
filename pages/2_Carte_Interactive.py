@@ -655,15 +655,13 @@ if 'sel_map'    not in st.session_state: st.session_state.sel_map    = None
 if 'sel_source' not in st.session_state: st.session_state.sel_source = None
 
 # ==============================
-# HEADER
+# HEADER IMAGE
 # ==============================
-# Header image
-try:
-    st.markdown('<div class="header-container">', unsafe_allow_html=True)
-    st.image("assets/images/codex_header.png", use_column_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-except Exception:
-    pass
+st.markdown("""
+<div class="header-container">
+    <img src="https://raw.githubusercontent.com/EpSyDev/codex-validateur/main/assets/images/codex_header.png" alt="CODEX">
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown('<div class="content-wrapper">', unsafe_allow_html=True)
 st.markdown('<div class="page-title">🗺️ Carte Interactive — DayZ</div>', unsafe_allow_html=True)
