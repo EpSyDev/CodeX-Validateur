@@ -121,7 +121,7 @@ header { visibility: hidden; }
     transition: all 0.3s ease; 
 }
 .roadmap-card:hover { 
-    border-color: rgba(0, 212, 255, 0.4); 
+    border-color: rgba(0, 212, 212, 0.4); 
     box-shadow: 0 8px 30px rgba(0, 212, 255, 0.2); 
 }
 .roadmap-title { font-size: 26px; font-weight: 800; color: #FFFFFF; margin-bottom: 28px; }
@@ -191,7 +191,7 @@ st.markdown("""
 
 st.markdown('<div class="modules-wrapper"><h2 class="section-title">🚀 Modules disponibles</h2>', unsafe_allow_html=True)
 
-col1, col2, col3 = st.columns(3, gap="large")
+col1, col2, col3, col4 = st.columns(4, gap="large")
 
 with col1:
     st.markdown("""
@@ -244,6 +244,23 @@ with col3:
     if st.button("📖 Ouvrir", key="d"):
         st.switch_page("pages/3_Documentation.py")
 
+with col4:
+    st.markdown("""
+    <div class="card">
+        <div class="card-icon">🔍</div>
+        <div class="card-title">Comparateur</div>
+        <div class="card-text">Compare ton types.xml custom avec le vanilla officiel et identifie chaque différence</div>
+        <div class="card-list">
+            <div class="list-line">Ajouts & suppressions</div>
+            <div class="list-line">Champs modifiés</div>
+            <div class="list-line">Export Excel</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("")
+    if st.button("🔍 Ouvrir", key="c"):
+        st.switch_page("pages/4_Comparateur.py")
+
 st.markdown('</div>', unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════
@@ -280,6 +297,7 @@ with r1:
         <div class="roadmap-item done">Validation sémantique</div>
         <div class="roadmap-item done">Documentation complète</div>
         <div class="roadmap-item done">Carte Chernarus / Livonia / Sakhal</div>
+        <div class="roadmap-item done">Comparateur vanilla / custom</div>
     </div>
     """, unsafe_allow_html=True)
 
