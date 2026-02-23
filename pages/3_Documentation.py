@@ -21,125 +21,13 @@ st.set_page_config(
 # CSS UNIFIÉ
 # ═══════════════════════════════════════════════════════
 
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from utils.styles import apply_styles, apply_header
 
-* { font-family: 'Inter', sans-serif; }
-.stApp { background: #000000; }
-#MainMenu { visibility: hidden; }
-footer { visibility: hidden; }
-header { visibility: hidden; }
-
-.header-container {
-    width: 100%;
-    margin: 0 0 40px 0;
-    padding: 0;
-}
-.header-container img {
-    width: 100%;
-    height: auto;
-    display: block;
-}
-
-.content-wrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 30px;
-}
-
-.page-title {
-    text-align: center;
-    font-size: 38px;
-    font-weight: 800;
-    color: #FFFFFF;
-    margin-bottom: 40px;
-    text-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
-}
-
-.info-box {
-    background: linear-gradient(135deg, rgba(0, 25, 50, 0.65) 0%, rgba(0, 15, 30, 0.75) 100%);
-    border: 1px solid rgba(0, 212, 255, 0.25);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 30px;
-}
-
-.info-box h3 {
-    color: #00D4FF;
-    font-size: 18px;
-    font-weight: 700;
-    margin-bottom: 12px;
-}
-
-.info-box p {
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 14px;
-    line-height: 1.6;
-    margin: 0;
-}
-
-.doc-card {
-    background: rgba(0, 25, 50, 0.55);
-    border: 1px solid rgba(0, 212, 255, 0.25);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
-}
-
-.doc-card:hover {
-    border-color: rgba(0, 212, 255, 0.5);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.2);
-}
-
-.doc-card h4 {
-    color: #00D4FF;
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0 0 12px 0;
-}
-
-.doc-card p {
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 14px;
-    line-height: 1.6;
-    margin: 0;
-}
-
-.stButton > button {
-    background: linear-gradient(135deg, #00D4FF 0%, #0EA5E9 100%);
-    color: #000000;
-    border: none;
-    border-radius: 14px;
-    padding: 12px 24px;
-    font-size: 14px;
-    font-weight: 700;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 18px rgba(0, 212, 255, 0.3);
-}
-.stButton > button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
-}
-
-.code-block {
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(0, 212, 255, 0.15);
-    border-radius: 8px;
-    padding: 16px;
-    margin: 12px 0;
-    overflow-x: auto;
-}
-
-.code-block code {
-    color: #00D4FF;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-}
-</style>
-""", unsafe_allow_html=True)
+apply_styles(st)
+apply_header(st)
 
 # ═══════════════════════════════════════════════════════
 # HEADER IMAGE
