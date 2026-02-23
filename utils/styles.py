@@ -222,6 +222,33 @@ pre *, code * {
 .context-code .line.error { background: rgba(239,68,68,0.2); border-left: 3px solid #ef4444; padding-left: 12px; color: #fff !important; }
 .context-code .line-num   { display: inline-block; width: 40px; color: rgba(255,255,255,0.4) !important; text-align: right; margin-right: 16px; }
 
+/* ── DOC CARD ── */
+.doc-card {
+    background: rgba(0, 25, 50, 0.55);
+    border: 1px solid rgba(0, 212, 255, 0.25);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+.doc-card:hover {
+    border-color: rgba(0, 212, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 212, 255, 0.2);
+}
+.doc-card h4 {
+    color: #00D4FF !important;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 12px 0;
+}
+.doc-card p {
+    color: rgba(255, 255, 255, 0.85) !important;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+}
+
 /* ── BOUTONS ── */
 .stButton > button {
     background: linear-gradient(135deg, #00D4FF 0%, #0EA5E9 100%);
