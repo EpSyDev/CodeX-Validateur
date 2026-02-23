@@ -20,7 +20,7 @@ from collections import defaultdict
 # ==============================
 st.set_page_config(
     page_title="Codex - Carte Interactive",
-    page_icon="assets/images/favicon.png",
+    page_icon="images/favicon.png",
     layout="wide"
 )
 
