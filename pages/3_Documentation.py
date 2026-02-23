@@ -12,7 +12,7 @@ from pathlib import Path
 
 st.set_page_config(
     page_title="Codex - Documentation",
-    page_icon="📚",
+    page_icon="images/favicon.png",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
