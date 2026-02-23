@@ -75,16 +75,6 @@ def render_code_context(context):
     return html
 
 # ═══════════════════════════════════════════════════════
-# HEADER IMAGE
-# ═══════════════════════════════════════════════════════
-
-st.markdown("""
-<div class="header-container">
-    <img src="https://raw.githubusercontent.com/EpSyDev/codex-validateur/main/assets/images/codex_header.png" alt="CODEX">
-</div>
-""", unsafe_allow_html=True)
-
-# ═══════════════════════════════════════════════════════
 # CONTENU PRINCIPAL
 # ═══════════════════════════════════════════════════════
 
