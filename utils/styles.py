@@ -47,6 +47,26 @@ h3, h4  { color: #00D4FF !important; }
 input::placeholder,
 textarea::placeholder { color: rgba(255,255,255,0.4) !important; }
 
+/* ── BLOCS CODE documentation ── */
+.stCode, 
+[data-testid="stCode"],
+pre, code {
+    background: #1a1a2e !important;
+    color: #00D4FF !important;
+    border: 1px solid rgba(0, 212, 255, 0.2) !important;
+    border-radius: 8px !important;
+}
+
+/* Texte dans les blocs code → lisible */
+pre *, code * {
+    color: #e0e0e0 !important;
+}
+
+/* Syntax highlighting conservé */
+.stCode code {
+    color: #e0e0e0 !important;
+}
+
 /* ── HEADER ── */
 .header-container {
     width: 100%;
