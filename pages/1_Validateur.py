@@ -257,7 +257,9 @@ if 'validation_result' in st.session_state:
     with tab1:
         if result.get("formatted"):
             st.subheader("📄 Fichier Formaté (version propre)")
+            st.markdown('<div class="file-output-box">', unsafe_allow_html=True)
             st.code(result["formatted"], language=result.get("file_type", "text"))
+            st.markdown('</div>', unsafe_allow_html=True)
             
             st.download_button(
                 label="💾 Télécharger formaté",
