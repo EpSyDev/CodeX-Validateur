@@ -81,10 +81,26 @@ st.markdown("""
 
     /* ── SELECTBOX ── */
     [data-testid="stSelectbox"] > div > div {
-        background: rgba(0, 25, 50, 0.7) !important;
+        background: rgba(15, 40, 70, 0.95) !important;
         border: 1px solid rgba(0, 212, 255, 0.35) !important;
         color: white !important;
         border-radius: 10px !important;
+    }
+    /* Liste déroulante dropdown */
+    [data-baseweb="popover"] [data-baseweb="menu"],
+    ul[data-baseweb="menu"] {
+        background: #0d2035 !important;
+        border: 1px solid rgba(0, 212, 255, 0.35) !important;
+        border-radius: 10px !important;
+    }
+    li[role="option"] {
+        background: #0d2035 !important;
+        color: rgba(255,255,255,0.85) !important;
+    }
+    li[role="option"]:hover,
+    li[aria-selected="true"] {
+        background: rgba(0, 212, 255, 0.15) !important;
+        color: #00D4FF !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -261,7 +277,7 @@ with col_map:
 
     vanilla_path = VANILLA_PATHS[map_name]
     if vanilla_path.exists():
-        st.success(f"✅ Vanilla {map_name} chargé ({vanilla_path.stat().st_size // 1024} Ko)")
+        st.markdown(f'<div style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.4);border-radius:8px;padding:8px 14px;color:#00D4FF;font-size:0.85rem;font-weight:600;">✅ Vanilla {map_name} chargé ({vanilla_path.stat().st_size // 1024} Ko)</div>', unsafe_allow_html=True)
     else:
         st.error(f"❌ Fichier vanilla introuvable : `{vanilla_path}`")
         st.stop()
