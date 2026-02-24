@@ -275,7 +275,7 @@ with s1:
 with s2:
     st.markdown('<div class="stat"><div class="stat-num">Correction</div><div class="stat-label">Exclusivité</div></div>', unsafe_allow_html=True)
 with s3:
-    st.markdown('<div class="stat"><div class="stat-num">3</div><div class="stat-label">Maps</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="stat"><div class="stat-num">3 Cartes</div><div class="stat-label">Chernarus/Livonia/Sakhal</div></div>', unsafe_allow_html=True)
 with s4:
     st.markdown('<div class="stat"><div class="stat-num">170+</div><div class="stat-label">Docs</div></div>', unsafe_allow_html=True)
 
