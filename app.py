@@ -273,7 +273,7 @@ s1, s2, s3, s4 = st.columns(4)
 with s1:
     st.markdown('<div class="stat"><div class="stat-num">100% Français</div><div class="stat-label">Validateurs</div></div>', unsafe_allow_html=True)
 with s2:
-    st.markdown('<div class="stat"><div class="stat-num">Correction Auto</div><div class="stat-label">Exclusivité</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="stat"><div class="stat-num">Correction</div><div class="stat-label">Exclusivité</div></div>', unsafe_allow_html=True)
 with s3:
     st.markdown('<div class="stat"><div class="stat-num">3</div><div class="stat-label">Maps</div></div>', unsafe_allow_html=True)
 with s4:
