@@ -23,6 +23,12 @@ apply_styles(st)
 apply_header(st)
 
 # ─────────────────────────────────────────────
+#  NAVIGATION
+# ─────────────────────────────────────────────
+if st.button("← Accueil", key="home"):
+    st.switch_page("app.py")
+
+# ─────────────────────────────────────────────
 #  STYLE SPÉCIFIQUE COMPARATEUR
 # ─────────────────────────────────────────────
 st.markdown("""
