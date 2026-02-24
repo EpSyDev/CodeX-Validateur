@@ -191,7 +191,7 @@ st.markdown("""
 
 st.markdown('<div class="modules-wrapper"><h2 class="section-title">🚀 Modules disponibles</h2>', unsafe_allow_html=True)
 
-col1, col2, col3, col4 = st.columns(4, gap="large")
+col1, col2, col3, col4, col5 = st.columns(5, gap="large")
 
 with col1:
     st.markdown("""
@@ -215,7 +215,7 @@ with col2:
     <div class="card">
         <div class="card-icon">🗺️</div>
         <div class="card-title">Carte Interactive</div>
-        <div class="card-text">Édite visuellement les spawns events et zombies sur les cartes DayZ</div>
+        <div class="card-text">Édite visuellement les spawns zombies sur les cartes DayZ</div>
         <div class="card-list">
             <div class="list-line">Chernarus</div>
             <div class="list-line">Livonia</div>
@@ -261,6 +261,23 @@ with col4:
     if st.button("🔍 Ouvrir", key="c"):
         st.switch_page("pages/4_Comparateur.py")
 
+with col5:
+    st.markdown("""
+    <div class="card">
+        <div class="card-icon">🌦️</div>
+        <div class="card-title">Météo</div>
+        <div class="card-text">Configure la météo de ton serveur et génère ton cfgweather.xml en temps réel</div>
+        <div class="card-list">
+            <div class="list-line">8 présets rapides</div>
+            <div class="list-line">Prévisualisation 24h</div>
+            <div class="list-line">Export XML prêt</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("")
+    if st.button("🌦️ Ouvrir", key="w"):
+        st.switch_page("pages/5_Meteo.py")
+
 st.markdown('</div>', unsafe_allow_html=True)
 
 # ═══════════════════════════════════════════════════════
@@ -271,11 +288,11 @@ st.markdown('<div class="stats-section"><h2 class="section-title">📊 Codex en 
 
 s1, s2, s3, s4 = st.columns(4)
 with s1:
-    st.markdown('<div class="stat"><div class="stat-num">100% Français</div><div class="stat-label">Validateurs</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="stat"><div class="stat-num">13+</div><div class="stat-label">Validateurs</div></div>', unsafe_allow_html=True)
 with s2:
-    st.markdown('<div class="stat"><div class="stat-num">Correction</div><div class="stat-label">Exclusivité</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="stat"><div class="stat-num">100%</div><div class="stat-label">Auto</div></div>', unsafe_allow_html=True)
 with s3:
-    st.markdown('<div class="stat"><div class="stat-num">3 Cartes</div><div class="stat-label">Chernarus/Livonia/Sakhal</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="stat"><div class="stat-num">3</div><div class="stat-label">Maps</div></div>', unsafe_allow_html=True)
 with s4:
     st.markdown('<div class="stat"><div class="stat-num">170+</div><div class="stat-label">Docs</div></div>', unsafe_allow_html=True)
 
@@ -298,6 +315,7 @@ with r1:
         <div class="roadmap-item done">Documentation complète</div>
         <div class="roadmap-item done">Carte Chernarus / Livonia / Sakhal</div>
         <div class="roadmap-item done">Comparateur vanilla / custom</div>
+        <div class="roadmap-item done">Configurateur météo</div>
     </div>
     """, unsafe_allow_html=True)
 
