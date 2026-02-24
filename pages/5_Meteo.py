@@ -223,6 +223,7 @@ for i, (name, data) in enumerate(PRESETS.items()):
             for k, v in data.items():
                 if k != "icon":
                     st.session_state[f"w_{k}"] = v
+                    st.session_state[f"s_{k}"] = v  # force le slider
             st.session_state.active_preset = name
             st.rerun()
 
@@ -432,8 +433,7 @@ fig.update_layout(
     yaxis=dict(
         gridcolor="rgba(0,212,255,0.08)",
         range=[0, 1.05],
-        title="Intensité (0-1)",
-        titlefont=dict(size=11),
+        title=dict(text="Intensité (0-1)", font=dict(size=11)),
     ),
     height=320,
     margin=dict(l=50, r=20, t=40, b=60),
