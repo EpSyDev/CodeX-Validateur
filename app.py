@@ -215,7 +215,7 @@ with col2:
     <div class="card">
         <div class="card-icon">🗺️</div>
         <div class="card-title">Carte Interactive</div>
-        <div class="card-text">Édite visuellement les spawns zombies sur les cartes DayZ</div>
+        <div class="card-text">Édite visuellement les spawns events et zombies sur les cartes DayZ</div>
         <div class="card-list">
             <div class="list-line">Chernarus</div>
             <div class="list-line">Livonia</div>
@@ -271,9 +271,9 @@ st.markdown('<div class="stats-section"><h2 class="section-title">📊 Codex en 
 
 s1, s2, s3, s4 = st.columns(4)
 with s1:
-    st.markdown('<div class="stat"><div class="stat-num">13+</div><div class="stat-label">Validateurs</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="stat"><div class="stat-num">100% Français</div><div class="stat-label">Validateurs</div></div>', unsafe_allow_html=True)
 with s2:
-    st.markdown('<div class="stat"><div class="stat-num">100%</div><div class="stat-label">Auto</div></div>', unsafe_allow_html=True)
+    st.markdown('<div class="stat"><div class="stat-num">Correction Auto</div><div class="stat-label">Exclusivité</div></div>', unsafe_allow_html=True)
 with s3:
     st.markdown('<div class="stat"><div class="stat-num">3</div><div class="stat-label">Maps</div></div>', unsafe_allow_html=True)
 with s4:
